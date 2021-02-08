@@ -1,0 +1,44 @@
+h1.page-title {
+    color: darkgray;
+}
+
+/* Styling for cards */
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 2px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+
+bs-callout.p:last-child {
+    margin-bottom: 0;
+}
+
+.bs-callout-danger {
+    border-left-color: #ce4844;
+}
+
+h4.danger {
+    color: #ce4844;
+}
+
+.bs-callout-warning {
+    border-left-color: #aa6708;
+}
+
+h4.warning {
+    color: #aa6708;
+}
+
+.bs-callout-info {
+    border-left-color: #007bff;
+}
+
+h4.info {
+    color: #007bff;
+}
+
+.top-margin-spacing {
+    margin-top: 10px;
+}
