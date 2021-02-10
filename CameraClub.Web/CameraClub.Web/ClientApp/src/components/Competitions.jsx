@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
-import { ApiInterface } from '../ApiInterface';
+import { CompetitionModal } from './CompetitionModal';
 
 export class Competitions extends Component {
     static displayName = Competitions.name;
@@ -17,34 +17,62 @@ export class Competitions extends Component {
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.handleClose = this.handleClose.bind(this);
     }
 
     componentDidMount() {
         this.getCompetitionData();
     }
 
-    showModal = () => {
-        this.setState({ isModalVisible: true });
+    showModal = (competition) => {
+        this.setState(
+            {
+                isModalVisible: true,
+                currentCompetition: competition
+            });
     };
 
     hideModal = () => {
         this.setState({ isModalVisible: false });
     };
 
+    handleSave = () => {
+        // TODO:
+    }
+
+    handleClose = () => {
+        // TODO:
+    }
+
     getCompetitionData() {
-        var url = ApiInterface.apiUrl;
+        var url = process.env.REACT_APP_API_URL + 'GetCompetitions';
 
-        // TODO: fetch from API
-
-        this.setState({
-            loading: false,
-            error: false,
-            competitionData:
-                [
-                    { "Id": "0", "Name": "Spring Extravaganza", "Date": "03/01/2021", "HasDigital": true, "HasPrint": false },
-                    { "Id": "1", "Name": "Fall Extravaganza", "Date": "09/01/2021", "HasDigital": true, "HasPrint": true }
-                ]
-        })
+        fetch(url,
+            {
+                method: "GET"
+            })
+            .then(response => response.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        loading: false,
+                        error: false,
+                        errorMessage: null,
+                        competitionData: result === null ? [] : result,
+                        currentCompetition: result === null ? [] : result[0]
+                    })
+                },
+                (error) => {
+                    console.log(error);
+                    this.setState({
+                        loading: false,
+                        error: true,
+                        errorMessage: error,
+                        competitionData: null
+                    });
+                }
+            );
     }
 
     renderCompetitions() {
@@ -57,38 +85,38 @@ export class Competitions extends Component {
                 </Row>
                 <Row>
                     <Col className="text-right">
-                        <button className="btn btn-primary">Add Competition</button>
+                        <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); this.showModal({ "name": "", "date": new Date(), "hasDigital": false, "hasPrint": false }); } }>Add Competition</button>
                     </Col>
                 </Row>
                 <Row>
                     {this.state.competitionData.map(competition =>
-                        <Container key={competition.Id} className="bs-callout bs-callout-info">
+                        <Container key={competition.id} className="bs-callout bs-callout-info">
                             <Row>
                                 <Col>
-                                    <h4 className="info">{competition.Name} - {competition.Date}</h4>
+                                    <h4 className="info">{competition.name} - {new Intl.DateTimeFormat('en-us').format(new Date(competition.date))}</h4>
                                 </Col>
                             </Row>
                             <Row className="top-margin-spacing">
-                                <Col>Digital included? {competition.HasDigital ? "Yes" : "No"}</Col>
+                                <Col>Digital included? {competition.hasDigital ? "Yes" : "No"}</Col>
                             </Row>
                             <Row>
-                                <Col>Print included? {competition.HasPrint ? "Yes" : "No"}</Col>
+                                <Col>Print included? {competition.hasPrint ? "Yes" : "No"}</Col>
                             </Row>
                             <Row className="top-margin-spacing">
                                 <Col>
                                     <Container>
                                         <Row>
                                             <Col>
-                                                <button className="btn btn-link" onClick={(e) => { e.preventDefault(); alert('modal should open'); }}>Edit</button>
+                                                <button className="btn btn-link" onClick={(e) => { e.preventDefault(); this.showModal(competition); }}>Edit</button>
                                             </Col>
                                             <Col>
-                                                <a className="btn btn-link" href={"/CompetitionPhotographers?competitionId=" + competition.Id}>Photographers</a>
+                                                <a className="btn btn-link" href={"/CompetitionPhotographers?competitionId=" + competition.id}>Photographers</a>
                                             </Col>
                                             <Col>
-                                                <a className="btn btn-link" href={"/Scores?competitionId=" + competition.Id}>Scores</a>
+                                                <a className="btn btn-link" href={"/Scores?competitionId=" + competition.id}>Scores</a>
                                             </Col>
                                             <Col>
-                                                <a className="btn btn-link" href={"/Present?competitionId=" + competition.Id}>Present</a>
+                                                <a className="btn btn-link" href={"/Present?competitionId=" + competition.id}>Present</a>
                                             </Col>
                                             <Col></Col>
                                             <Col></Col>
@@ -105,6 +133,7 @@ export class Competitions extends Component {
                         </Container>
                     )}
                 </Row>
+                <CompetitionModal handleClose={this.handleClose} handleSave={this.handleSave} show={this.state.isModalVisible} competitionData={this.state.currentCompetition} />
             </>
         );
     }
