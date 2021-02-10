@@ -5,7 +5,7 @@ export class CompetitionModal extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { id: 0, name: "", hasDigital: false, hasPrint: false };
+        this.state = { id: 0, name: "", date: "", hasDigital: false, hasPrint: false };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSave = this.handleSave.bind(this);
@@ -71,15 +71,15 @@ export class CompetitionModal extends Component {
                             <Row>
                                 <Label for="date" sm={2}>Date</Label>
                                 <Col sm={10}>
-                                    <Input type="text" name="name" placeholder="MM/DD/YYYY" value={this.state.date} onChange={this.handleChange} />
+                                    <Input type="text" name="date" placeholder="MM/DD/YYYY" value={this.state.date} onChange={this.handleChange} />
                                 </Col>
                             </Row>
                             <div className="form-check top-margin-spacing">
-                                <input className="form-check-input" type="checkbox" id="hasDigital" checked={this.state.hasDigital} onChange={this.handleChange} />
+                                <input className="form-check-input" type="checkbox" id="hasDigital" name="hasDigital" checked={this.state.hasDigital} onChange={this.handleChange} />
                                 <label className="form-check-label" htmlFor="hasDigital">Digital</label>
                             </div>
                             <div className="form-check">
-                                <input className="form-check-input" type="checkbox" id="hasPrint" checked={this.state.hasPrint} onChange={this.handleChange} />
+                                <input className="form-check-input" type="checkbox" id="hasPrint" name="hasPrint" checked={this.state.hasPrint} onChange={this.handleChange} />
                                 <label className="form-check-label" htmlFor="hasPrint">Print</label>
                             </div>
                         </Container>

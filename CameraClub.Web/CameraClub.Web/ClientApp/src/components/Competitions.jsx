@@ -26,7 +26,7 @@ export class Competitions extends Component {
 
     showModal = (competition) => {
         if (competition === null) {
-            competition = { "name": "", "date": new Date(), "hasDigital": false, "hasPrint": false };
+            competition = { "id": null, "name": "", "date": "", "hasDigital": false, "hasPrint": false };
         }
 
         this.setState(
@@ -40,20 +40,75 @@ export class Competitions extends Component {
         this.setState({ isModalVisible: false });
     };
 
-    handleSave = (competition) => {
-        if (competition.id !== null) {
-            // TODO: put api, and this.hideModal();
+    showError(error) {
+        console.log(error);
+        this.setState({
+            loading: false,
+            error: true,
+            errorMessage: error,
+            userApprovals: null
+        });
+    }
 
-            var competitionToUpdate = this.state.competitionData.find(c => c.id === competition.id);
-            competitionToUpdate.name = competition.name;
-            competitionToUpdate.date = competition.date;
-            competitionToUpdate.hasDigital = competition.hasDigital;
-            competitionToUpdate.hasPrint = competition.hasPrint;
+    handleSave = (competition) => {
+        var url = process.env.REACT_APP_API_URL + "UpsertCompetition";
+
+        if (competition.id !== null) {
+            fetch(url,
+                {
+                    method: "PUT",
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: competition.id,
+                        name: competition.name,
+                        date: competition.date,
+                        hasDigital: competition.hasDigital,
+                        hasPrint: competition.hasPrint
+                    })
+                })
+                .then(
+                    (result) => {
+                        var competitionToUpdate = this.state.competitionData.find(c => c.id === competition.id);
+                        competitionToUpdate.name = competition.name;
+                        competitionToUpdate.date = competition.date;
+                        competitionToUpdate.hasDigital = competition.hasDigital;
+                        competitionToUpdate.hasPrint = competition.hasPrint;
+
+                        this.hideModal();
+                    },
+                    (error) => {
+                        this.hideModal();
+                        this.showError(error);
+                    }
+                );
         }
         else {
-            // TODO: post api and update the id in the competition; and this.hideModal();
+            fetch(url,
+                {
+                    method: "POST",
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: competition.name,
+                        date: competition.date,
+                        hasDigital: competition.hasDigital,
+                        hasPrint: competition.hasPrint
+                    })
+                })
+                .then(
+                    (result) => {
+                        this.state.competitionData.push(competition);
 
-            this.state.competitionData.push(competition);
+                        this.hideModal();
+                    },
+                    (error) => {
+                        this.hideModal();
+                        this.showError(error);
+                    }
+                );
         }
     }
 
@@ -76,13 +131,7 @@ export class Competitions extends Component {
                     })
                 },
                 (error) => {
-                    console.log(error);
-                    this.setState({
-                        loading: false,
-                        error: true,
-                        errorMessage: error,
-                        competitionData: null
-                    });
+                    this.showError(error);
                 }
             );
     }
