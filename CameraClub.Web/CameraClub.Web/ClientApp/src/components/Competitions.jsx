@@ -18,7 +18,6 @@ export class Competitions extends Component {
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
         this.handleSave = this.handleSave.bind(this);
-        this.handleClose = this.handleClose.bind(this);
     }
 
     componentDidMount() {
@@ -26,6 +25,10 @@ export class Competitions extends Component {
     }
 
     showModal = (competition) => {
+        if (competition === null) {
+            competition = { "name": "", "date": new Date(), "hasDigital": false, "hasPrint": false };
+        }
+
         this.setState(
             {
                 isModalVisible: true,
@@ -37,12 +40,21 @@ export class Competitions extends Component {
         this.setState({ isModalVisible: false });
     };
 
-    handleSave = () => {
-        // TODO:
-    }
+    handleSave = (competition) => {
+        if (competition.id !== null) {
+            // TODO: put api, and this.hideModal();
 
-    handleClose = () => {
-        // TODO:
+            var competitionToUpdate = this.state.competitionData.find(c => c.id === competition.id);
+            competitionToUpdate.name = competition.name;
+            competitionToUpdate.date = competition.date;
+            competitionToUpdate.hasDigital = competition.hasDigital;
+            competitionToUpdate.hasPrint = competition.hasPrint;
+        }
+        else {
+            // TODO: post api and update the id in the competition; and this.hideModal();
+
+            this.state.competitionData.push(competition);
+        }
     }
 
     getCompetitionData() {
@@ -85,7 +97,7 @@ export class Competitions extends Component {
                 </Row>
                 <Row>
                     <Col className="text-right">
-                        <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); this.showModal({ "name": "", "date": new Date(), "hasDigital": false, "hasPrint": false }); } }>Add Competition</button>
+                        <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); this.showModal(null); }}>Add Competition</button>
                     </Col>
                 </Row>
                 <Row>
@@ -133,7 +145,7 @@ export class Competitions extends Component {
                         </Container>
                     )}
                 </Row>
-                <CompetitionModal handleClose={this.handleClose} handleSave={this.handleSave} show={this.state.isModalVisible} competitionData={this.state.currentCompetition} />
+                <CompetitionModal handleClose={this.hideModal} handleSave={this.handleSave} show={this.state.isModalVisible} competitionData={this.state.currentCompetition} />
             </>
         );
     }
