@@ -15,10 +15,14 @@ namespace CameraClub.Function
     public class CompetitionInfo
     {
         private readonly CompetitionContext competitionContext;
+        private readonly UpsertEntity upsertEntity;
+        private readonly Translator translator;
 
-        public CompetitionInfo(CompetitionContext competitionContext)
+        public CompetitionInfo(CompetitionContext competitionContext, UpsertEntity upsertEntity, Translator translator)
         {
             this.competitionContext = competitionContext;
+            this.upsertEntity = upsertEntity;
+            this.translator = translator;
         }
 
         [FunctionName("GetCompetitions")]
@@ -34,26 +38,9 @@ namespace CameraClub.Function
         public async Task<IActionResult> UpsertCompetition(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertCompetitionRequest request, ILogger log)
         {
-            var translator = new Translator();
-            Competition entity;
-
-            if (request.Id.HasValue)
+            if (!await this.upsertEntity.Upsert<UpsertCompetitionRequest, Competition>(this.competitionContext, request.Id, request, this.translator.TranslateCompetition))
             {
-                entity = await this.competitionContext.FindAsync<Competition>(request.Id.Value);
-
-                if (entity == null)
-                {
-                    return InvalidRequestResponse(request.Id.Value, log);
-                }
-
-                translator.TranslateCompetition(request, entity);
-            }
-            else
-            {
-                entity = new Competition();
-                translator.TranslateCompetition(request, entity);
-
-                this.competitionContext.Add(entity);
+                return InvalidRequestResponse<UpsertCompetitionRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -74,26 +61,9 @@ namespace CameraClub.Function
         public async Task<IActionResult> UpsertCategory(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertCategoryRequest request, ILogger log)
         {
-            var translator = new Translator();
-            Category entity;
-
-            if (request.Id.HasValue)
+            if (!await this.upsertEntity.Upsert<UpsertCategoryRequest, Category>(this.competitionContext, request.Id, request, this.translator.TranslateCategory))
             {
-                entity = await this.competitionContext.FindAsync<Category>(request.Id.Value);
-
-                if (entity == null)
-                {
-                    return InvalidRequestResponse(request.Id.Value, log);
-                }
-
-                translator.TranslateCategory(request, entity);
-            }
-            else
-            {
-                entity = new Category();
-                translator.TranslateCategory(request, entity);
-
-                this.competitionContext.Add(entity);
+                return InvalidRequestResponse<UpsertCategoryRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -114,26 +84,9 @@ namespace CameraClub.Function
         public async Task<IActionResult> UpsertJudges(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertJudgeRequest request, ILogger log)
         {
-            var translator = new Translator();
-            Judge entity;
-
-            if (request.Id.HasValue)
+            if (!await this.upsertEntity.Upsert<UpsertJudgeRequest, Judge>(this.competitionContext, request.Id, request, this.translator.TranslateJudge))
             {
-                entity = await this.competitionContext.FindAsync<Judge>(request.Id.Value);
-
-                if (entity == null)
-                {
-                    return InvalidRequestResponse(request.Id.Value, log);
-                }
-
-                translator.TranslateJudge(request, entity);
-            }
-            else
-            {
-                entity = new Judge();
-                translator.TranslateJudge(request, entity);
-
-                this.competitionContext.Add(entity);
+                return InvalidRequestResponse<UpsertJudgeRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -154,26 +107,9 @@ namespace CameraClub.Function
         public async Task<IActionResult> UpsertPhotographer(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertPhotographerRequest request, ILogger log)
         {
-            var translator = new Translator();
-            Photographer entity;
-
-            if (request.Id.HasValue)
+            if (!await this.upsertEntity.Upsert<UpsertPhotographerRequest, Photographer>(this.competitionContext, request.Id, request, this.translator.TranslatePhotographer))
             {
-                entity = await this.competitionContext.FindAsync<Photographer>(request.Id.Value);
-
-                if (entity == null)
-                {
-                    return InvalidRequestResponse(request.Id.Value, log);
-                }
-
-                translator.TranslatePhotographer(request, entity);
-            }
-            else
-            {
-                entity = new Photographer();
-                translator.TranslatePhotographer(request, entity);
-
-                this.competitionContext.Add(entity);
+                return InvalidRequestResponse<UpsertPhotographerRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -194,26 +130,9 @@ namespace CameraClub.Function
         public async Task<IActionResult> UpsertClub(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertClubRequest request, ILogger log)
         {
-            var translator = new Translator();
-            Club entity;
-
-            if (request.Id.HasValue)
+            if (!await this.upsertEntity.Upsert<UpsertClubRequest, Club>(this.competitionContext, request.Id, request, this.translator.TranslateClub))
             {
-                entity = await this.competitionContext.FindAsync<Club>(request.Id.Value);
-
-                if (entity == null)
-                {
-                    return InvalidRequestResponse(request.Id.Value, log);
-                }
-
-                translator.TranslateClub(request, entity);
-            }
-            else
-            {
-                entity = new Club();
-                translator.TranslateClub(request, entity);
-
-                this.competitionContext.Add(entity);
+                return InvalidRequestResponse<UpsertClubRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -221,9 +140,9 @@ namespace CameraClub.Function
             return new OkResult();
         }
 
-        private static IActionResult InvalidRequestResponse(int id, ILogger log)
+        private static IActionResult InvalidRequestResponse<T>(int id, ILogger log)
         {
-            log.LogInformation($"Request made with an invalid Id {id}");
+            log.LogInformation($"Request of type {typeof(T).Name} made with an invalid Id {id}");
 
             return new NotFoundResult();
         }
