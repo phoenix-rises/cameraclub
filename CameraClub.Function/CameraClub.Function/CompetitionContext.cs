@@ -27,10 +27,31 @@ namespace CameraClub.Function
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Photo>()
+                .HasOne(c => c.Category);
+            modelBuilder.Entity<Photo>()
+                .HasOne(p => p.Photographer);
+            modelBuilder.Entity<Photo>()
+                .HasMany(p => p.PhotoScores);
+
+            modelBuilder.Entity<Photographer>()
+                .HasKey(pk => pk.Id);
+
             modelBuilder.Entity<PhotoScore>()
                 .HasKey(pk => new { pk.PhotoId, pk.JudgeId, pk.Round });
+            modelBuilder.Entity<PhotoScore>()
+                .HasOne(j => j.Judge);
+
             modelBuilder.Entity<CompetitionJudge>()
                 .HasKey(pk => new { pk.CompetitionId, pk.JudgeId });
+
+            modelBuilder.Entity<Competition>()
+                .HasMany(c => c.CompetitionJudge);
+            modelBuilder.Entity<Competition>()
+                .HasMany(p => p.Photos);
+
+            modelBuilder.Entity<Judge>()
+                .HasMany(j => j.CompetitionJudge);
         }
     }
 }

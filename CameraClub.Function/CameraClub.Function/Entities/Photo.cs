@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CameraClub.Function.Entities
@@ -17,5 +18,11 @@ namespace CameraClub.Function.Entities
         public int CategoryId { get; set; }
 
         public Guid StorageId { get; set; }
+
+        public Photographer Photographer { get; set; }
+
+        public Category Category { get; set; }
+
+        public List<PhotoScore> PhotoScores { get; set; }
     }
 }

@@ -8,5 +8,9 @@ namespace CameraClub.Function.Entities
         public int CompetitionId { get; set; }
 
         public int JudgeId { get; set; }
+
+        public Competition Competition { get; set; }
+
+        public Judge Judge { get; set; }
     }
 }

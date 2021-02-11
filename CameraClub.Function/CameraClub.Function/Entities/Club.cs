@@ -13,6 +13,6 @@ namespace CameraClub.Function.Entities
 
         public string ContactEmail { get; set; }
 
-        public string ClubAssocationNumber { get; set; }
+        public string ClubAssociationNumber { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CameraClub.Function.Entities
 {
@@ -16,5 +17,7 @@ namespace CameraClub.Function.Entities
         public string Bio { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public List<CompetitionJudge> CompetitionJudge { get; set; }
     }
 }

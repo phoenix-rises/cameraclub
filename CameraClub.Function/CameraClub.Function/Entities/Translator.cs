@@ -41,7 +41,7 @@ namespace CameraClub.Function.Entities
             entity.Name = request.Name;
             entity.ContactName = request.ContactName;
             entity.ContactEmail = request.ContactEmail;
-            entity.ClubAssocationNumber = request.ClubAssociationNumber;
+            entity.ClubAssociationNumber = request.ClubAssociationNumber;
         }
     }
 }

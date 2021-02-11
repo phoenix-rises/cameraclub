@@ -17,6 +17,8 @@ namespace CameraClub.Function.Entities
 
         public bool HasPrint { get; set; }
 
-        public List<Photographer> Photographers { get; set; }
+        public List<Photo> Photos { get; set; }
+
+        public List<CompetitionJudge> CompetitionJudge { get; set; }
     }
 }

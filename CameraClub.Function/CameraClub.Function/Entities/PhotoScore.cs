@@ -14,5 +14,7 @@ namespace CameraClub.Function.Entities
         public string Score { get; set; }
 
         public string Rank { get; set; }
+
+        public Judge Judge { get; set; }
     }
 }
