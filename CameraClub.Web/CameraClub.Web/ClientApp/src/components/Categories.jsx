@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { CategoriesModal } from './CategoriesModal';
+import { save, load } from '../ClubApi';
 
 export class Categories extends Component {
     static displayName = Categories.name;
@@ -17,7 +18,9 @@ export class Categories extends Component {
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
-        this.handleSave = this.handleSave.bind(this);
+        this.loadState = this.loadState.bind(this);
+        this.showError = this.showError.bind(this);
+        this.translate = this.translate.bind(this);
     }
 
     componentDidMount() {
@@ -50,84 +53,33 @@ export class Categories extends Component {
         });
     }
 
-    handleSave = (category) => {
-        var url = process.env.REACT_APP_API_URL + "UpsertCategory";
-
+    translate(category) {
         if (category.id !== null) {
-            fetch(url,
-                {
-                    method: "PUT",
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        id: category.id,
-                        name: category.name,
-                        isDigital: category.isDigital
-                    })
-                })
-                .then(
-                    (result) => {
-                        var categoryToUpdate = this.state.categoryData.find(c => c.id === category.id);
-                        categoryToUpdate.name = category.name;
-                        categoryToUpdate.isDigital = category.isDigital;
-
-                        this.hideModal();
-                    },
-                    (error) => {
-                        this.hideModal();
-                        this.showError(error);
-                    }
-                );
+            var categoryToUpdate = this.state.categoryData.find(c => c.id === category.id);
+            categoryToUpdate.name = category.name;
+            categoryToUpdate.isDigital = category.isDigital;
         }
         else {
-            fetch(url,
-                {
-                    method: "POST",
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: category.name,
-                        isDigital: category.isDigital
-                    })
-                })
-                .then(
-                    (result) => {
-                        this.state.categoryData.push(category);
-
-                        this.hideModal();
-                    },
-                    (error) => {
-                        this.hideModal();
-                        this.showError(error);
-                    }
-                );
+            this.state.categoryData.push(category);
         }
     }
 
-    getCategoryData() {
-        var url = process.env.REACT_APP_API_URL + 'GetCategories';
+    loadState(categories) {
+        this.setState({
+            loading: false,
+            error: false,
+            errorMessage: null,
+            categoryData: categories,
+            currentCategory: categories[0]
+        });
+    }
 
-        fetch(url,
-            {
-                method: "GET"
-            })
-            .then(response => response.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        loading: false,
-                        error: false,
-                        errorMessage: null,
-                        categoryData: result === null ? [] : result,
-                        currentCategory: result === null ? [] : result[0]
-                    })
-                },
-                (error) => {
-                    this.showError(error);
-                }
-            );
+    handleSave = (competition) => {
+        save("UpsertCategory", competition, this.translate, this.hideModal, this.showError);
+    }
+
+    getCategoryData() {
+        load("GetCategories", this.showError, this.loadState);
     }
 
     renderCategories() {

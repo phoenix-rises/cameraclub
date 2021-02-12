@@ -38,7 +38,7 @@ export class CategoriesModal extends Component {
                 {
                     id: data.id,
                     name: data.name,
-                    hasDigital: data.isDigital
+                    isDigital: data.isDigital
                 });
         }
     }

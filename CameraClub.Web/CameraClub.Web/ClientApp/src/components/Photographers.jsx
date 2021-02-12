@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { PhotographersModal } from './PhotographersModal';
+import { save, load } from '../ClubApi';
 
 export class Photographers extends Component {
     static displayName = Photographers.name;
@@ -17,7 +18,9 @@ export class Photographers extends Component {
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
-        this.handleSave = this.handleSave.bind(this);
+        this.loadState = this.loadState.bind(this);
+        this.showError = this.showError.bind(this);
+        this.translate = this.translate.bind(this);
     }
 
     componentDidMount() {
@@ -50,93 +53,36 @@ export class Photographers extends Component {
         });
     }
 
-    handleSave = (photographer) => {
-        var url = process.env.REACT_APP_API_URL + "UpsertPhotographer";
-
+    translate(photographer) {
         if (photographer.id !== null) {
-            fetch(url,
-                {
-                    method: "PUT",
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        id: photographer.id,
-                        firstName: photographer.firstName,
-                        lastName: photographer.lastName,
-                        competitionNumber: photographer.competitionNumber,
-                        email: photographer.email,
-                        clubNumber: photographer.clubNumber
-                    })
-                })
-                .then(
-                    (result) => {
-                        var photographerToUpdate = this.state.photographerData.find(c => c.id === photographer.id);
-                        photographerToUpdate.firstName = photographer.firstName;
-                        photographerToUpdate.lastName = photographer.lastName;
-                        photographerToUpdate.email = photographer.email;
-                        photographerToUpdate.competitionNumber = photographer.competitionNumber;
-                        photographerToUpdate.clubNumber = photographer.clubNumber;
-
-                        this.hideModal();
-                    },
-                    (error) => {
-                        this.hideModal();
-                        this.showError(error);
-                    }
-                );
+            var photographerToUpdate = this.state.photographerData.find(c => c.id === photographer.id);
+            photographerToUpdate.firstName = photographer.firstName;
+            photographerToUpdate.lastName = photographer.lastName;
+            photographerToUpdate.email = photographer.email;
+            photographerToUpdate.competitionNumber = photographer.competitionNumber;
+            photographerToUpdate.clubNumber = photographer.clubNumber;
         }
         else {
-            fetch(url,
-                {
-                    method: "POST",
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        firstName: photographer.firstName,
-                        lastName: photographer.lastName,
-                        competitionNumber: photographer.competitionNumber,
-                        email: photographer.email,
-                        clubNumber: photographer.clubNumber
-                    })
-                })
-                .then(
-                    (result) => {
-                        this.state.photographerData.push(photographer);
-
-                        this.hideModal();
-                    },
-                    (error) => {
-                        this.hideModal();
-                        this.showError(error);
-                    }
-                );
+            this.state.photographerData.push(photographer);
         }
     }
 
-    getPhotographerData() {
-        var url = process.env.REACT_APP_API_URL + 'GetPhotographers';
+    loadState(photographers) {
+        this.setState({
+            loading: false,
+            error: false,
+            errorMessage: null,
+            photographerData: photographers,
+            currentPhotographer: photographers[0]
+        });
+    }
 
-        fetch(url,
-            {
-                method: "GET"
-            })
-            .then(response => response.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        loading: false,
-                        error: false,
-                        errorMessage: null,
-                        photographerData: result,
-                        currentPhotographer: result[0]
-                    })
-                },
-                (error) => {
-                    this.showError(error);
-                }
-            );
+    handleSave = (photographer) => {
+        save("UpsertPhotographer", photographer, this.translate, this.hideModal, this.showError);
+    }
+
+    getPhotographerData() {
+        load("GetPhotographers", this.showError, this.loadState);
     }
 
     renderPhotographers() {

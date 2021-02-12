@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { CompetitionModal } from './CompetitionModal';
+import { save, load } from '../ClubApi';
 
 export class Competitions extends Component {
     static displayName = Competitions.name;
@@ -17,7 +18,9 @@ export class Competitions extends Component {
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
-        this.handleSave = this.handleSave.bind(this);
+        this.loadState = this.loadState.bind(this);
+        this.showError = this.showError.bind(this);
+        this.translate = this.translate.bind(this);
     }
 
     componentDidMount() {
@@ -50,90 +53,35 @@ export class Competitions extends Component {
         });
     }
 
-    handleSave = (competition) => {
-        var url = process.env.REACT_APP_API_URL + "UpsertCompetition";
-
+    translate(competition) {
         if (competition.id !== null) {
-            fetch(url,
-                {
-                    method: "PUT",
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        id: competition.id,
-                        name: competition.name,
-                        date: competition.date,
-                        hasDigital: competition.hasDigital,
-                        hasPrint: competition.hasPrint
-                    })
-                })
-                .then(
-                    (result) => {
-                        var competitionToUpdate = this.state.competitionData.find(c => c.id === competition.id);
-                        competitionToUpdate.name = competition.name;
-                        competitionToUpdate.date = competition.date;
-                        competitionToUpdate.hasDigital = competition.hasDigital;
-                        competitionToUpdate.hasPrint = competition.hasPrint;
-
-                        this.hideModal();
-                    },
-                    (error) => {
-                        this.hideModal();
-                        this.showError(error);
-                    }
-                );
+            var competitionToUpdate = this.state.competitionData.find(c => c.id === competition.id);
+            competitionToUpdate.name = competition.name;
+            competitionToUpdate.date = competition.date;
+            competitionToUpdate.hasDigital = competition.hasDigital;
+            competitionToUpdate.hasPrint = competition.hasPrint;
         }
         else {
-            fetch(url,
-                {
-                    method: "POST",
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: competition.name,
-                        date: competition.date,
-                        hasDigital: competition.hasDigital,
-                        hasPrint: competition.hasPrint
-                    })
-                })
-                .then(
-                    (result) => {
-                        this.state.competitionData.push(competition);
-
-                        this.hideModal();
-                    },
-                    (error) => {
-                        this.hideModal();
-                        this.showError(error);
-                    }
-                );
+            this.state.competitionData.push(competition);
         }
     }
 
-    getCompetitionData() {
-        var url = process.env.REACT_APP_API_URL + 'GetCompetitions';
+    loadState(competitions) {
+        this.setState({
+            loading: false,
+            error: false,
+            errorMessage: null,
+            competitionData: competitions,
+            currentCompetition: competitions[0]
+        });
+    }
 
-        fetch(url,
-            {
-                method: "GET"
-            })
-            .then(response => response.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        loading: false,
-                        error: false,
-                        errorMessage: null,
-                        competitionData: result === null ? [] : result,
-                        currentCompetition: result === null ? [] : result[0]
-                    })
-                },
-                (error) => {
-                    this.showError(error);
-                }
-            );
+    handleSave = (competition) => {
+        save("UpsertCompetition", competition, this.translate, this.hideModal, this.showError);
+    }
+
+    getCompetitionData() {
+        load("GetCompetitions", this.showError, this.loadState);
     }
 
     renderCompetitions() {
