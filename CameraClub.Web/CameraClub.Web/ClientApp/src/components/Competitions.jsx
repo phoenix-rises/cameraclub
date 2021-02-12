@@ -1,10 +1,10 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { CompetitionModal } from './CompetitionModal';
-import { save, load } from '../ClubApi';
+import { ClubApi } from '../ClubApi';
 
 export class Competitions extends Component {
-    static displayName = Competitions.name;
+    clubApi;
 
     constructor(props) {
         super(props);
@@ -15,6 +15,8 @@ export class Competitions extends Component {
             errorMessage: "",
             isModalVisible: false
         }
+
+        this.clubApi = new ClubApi();
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
@@ -77,11 +79,11 @@ export class Competitions extends Component {
     }
 
     handleSave = (competition) => {
-        save("UpsertCompetition", competition, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("UpsertCompetition", competition, this.translate, this.hideModal, this.showError);
     }
 
     getCompetitionData() {
-        load("GetCompetitions", this.showError, this.loadState);
+        this.clubApi.load("GetCompetitions", this.showError, this.loadState);
     }
 
     renderCompetitions() {

@@ -1,10 +1,10 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { CategoriesModal } from './CategoriesModal';
-import { save, load } from '../ClubApi';
+import { ClubApi } from '../ClubApi';
 
 export class Categories extends Component {
-    static displayName = Categories.name;
+    clubApi;
 
     constructor(props) {
         super(props);
@@ -15,6 +15,8 @@ export class Categories extends Component {
             errorMessage: "",
             isModalVisible: false
         }
+
+        this.clubApi = new ClubApi();
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
@@ -75,11 +77,11 @@ export class Categories extends Component {
     }
 
     handleSave = (competition) => {
-        save("UpsertCategory", competition, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("UpsertCategory", competition, this.translate, this.hideModal, this.showError);
     }
 
     getCategoryData() {
-        load("GetCategories", this.showError, this.loadState);
+        this.clubApi.load("GetCategories", this.showError, this.loadState);
     }
 
     renderCategories() {

@@ -1,10 +1,10 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { JudgesModal } from './JudgesModal';
-import { save, load } from '../ClubApi';
+import { ClubApi } from '../ClubApi';
 
 export class Judges extends Component {
-    static displayName = Judges.name;
+    clubApi;
 
     constructor(props) {
         super(props);
@@ -15,6 +15,8 @@ export class Judges extends Component {
             errorMessage: "",
             isModalVisible: false
         }
+
+        this.clubApi = new ClubApi();
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
@@ -79,11 +81,11 @@ export class Judges extends Component {
     }
 
     handleSave = (judge) => {
-        save("UpsertJudges", judge, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("UpsertJudges", judge, this.translate, this.hideModal, this.showError);
     }
 
     getJudgeData() {
-        load("GetJudges", this.showError, this.loadState);
+        this.clubApi.load("GetJudges", this.showError, this.loadState);
     }
 
     renderJudges() {

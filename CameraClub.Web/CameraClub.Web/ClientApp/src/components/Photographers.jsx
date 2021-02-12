@@ -1,10 +1,10 @@
 ﻿import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { PhotographersModal } from './PhotographersModal';
-import { save, load } from '../ClubApi';
+import { ClubApi } from '../ClubApi';
 
 export class Photographers extends Component {
-    static displayName = Photographers.name;
+    clubApi;
 
     constructor(props) {
         super(props);
@@ -15,6 +15,8 @@ export class Photographers extends Component {
             errorMessage: "",
             isModalVisible: false
         }
+
+        this.clubApi = new ClubApi();
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
@@ -78,11 +80,11 @@ export class Photographers extends Component {
     }
 
     handleSave = (photographer) => {
-        save("UpsertPhotographer", photographer, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("UpsertPhotographer", photographer, this.translate, this.hideModal, this.showError);
     }
 
     getPhotographerData() {
-        load("GetPhotographers", this.showError, this.loadState);
+        this.clubApi.load("GetPhotographers", this.showError, this.loadState);
     }
 
     renderPhotographers() {
