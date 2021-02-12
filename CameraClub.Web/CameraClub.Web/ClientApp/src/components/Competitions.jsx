@@ -51,7 +51,8 @@ export class Competitions extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null
+            userApprovals: null,
+            isModalVisible: false
         });
     }
 
@@ -66,6 +67,8 @@ export class Competitions extends Component {
         else {
             this.state.competitionData.push(competition);
         }
+
+        this.hideModal();
     }
 
     loadState(competitions) {

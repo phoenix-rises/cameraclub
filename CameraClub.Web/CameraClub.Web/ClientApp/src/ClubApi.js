@@ -5,7 +5,7 @@
         this.baseUrl = process.env.REACT_APP_API_URL;
     }
 
-    save = (urlAction, data, translate, hideModal, showError) => {
+    save = (urlAction, data, translate, showError) => {
         var url = this.baseUrl + urlAction;
 
         if (data.id !== null) {
@@ -20,10 +20,8 @@
                 .then(
                     (result) => {
                         translate(data);
-                        hideModal();
                     },
                     (error) => {
-                        hideModal();
                         showError(error);
                     }
                 );
@@ -40,10 +38,8 @@
                 .then(
                     (result) => {
                         translate(data);
-                        hideModal();
                     },
                     (error) => {
-                        hideModal();
                         showError(error);
                     }
                 );

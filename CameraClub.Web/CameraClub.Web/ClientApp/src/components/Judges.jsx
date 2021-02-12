@@ -20,7 +20,6 @@ export class Judges extends Component {
 
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
-        this.handleSave = this.handleSave.bind(this);
         this.loadState = this.loadState.bind(this);
         this.showError = this.showError.bind(this);
         this.translate = this.translate.bind(this);
@@ -52,7 +51,8 @@ export class Judges extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null
+            userApprovals: null,
+            isModalVisible: false
         });
     }
 
@@ -68,6 +68,8 @@ export class Judges extends Component {
         else {
             this.state.judgeData.push(judge);
         }
+
+        this.hideModal();
     }
 
     loadState(judges) {

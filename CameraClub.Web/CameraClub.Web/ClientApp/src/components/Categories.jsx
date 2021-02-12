@@ -51,7 +51,8 @@ export class Categories extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null
+            userApprovals: null,
+            isModalVisible: false
         });
     }
 
@@ -64,6 +65,8 @@ export class Categories extends Component {
         else {
             this.state.categoryData.push(category);
         }
+
+        this.hideModal();
     }
 
     loadState(categories) {

@@ -51,7 +51,8 @@ export class Photographers extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null
+            userApprovals: null,
+            isModalVisible: false
         });
     }
 
@@ -67,6 +68,8 @@ export class Photographers extends Component {
         else {
             this.state.photographerData.push(photographer);
         }
+
+        this.hideModal();
     }
 
     loadState(photographers) {
