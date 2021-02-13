@@ -1,6 +1,6 @@
 ﻿namespace CameraClub.Function.Contracts
 {
-    public class UpsertCategoryRequest
+    public class SaveCategoryRequest
     {
         public int? Id { get; set; }
 

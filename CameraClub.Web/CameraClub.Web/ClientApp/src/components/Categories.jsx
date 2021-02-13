@@ -51,7 +51,6 @@ export class Categories extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null,
             isModalVisible: false
         });
     }

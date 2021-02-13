@@ -4,13 +4,13 @@ namespace CameraClub.Function.Entities
 {
     public class Translator
     {
-        public void TranslateCategory(UpsertCategoryRequest request, Category entity)
+        public void TranslateCategory(SaveCategoryRequest request, Category entity)
         {
             entity.Name = request.Name;
             entity.IsDigital = request.IsDigital;
         }
 
-        public void TranslateCompetition(UpsertCompetitionRequest request, Competition entity)
+        public void TranslateCompetition(SaveCompetitionRequest request, Competition entity)
         {
             entity.Name = request.Name;
             entity.Date = request.Date;
@@ -18,7 +18,7 @@ namespace CameraClub.Function.Entities
             entity.HasPrint = request.HasPrint;
         }
 
-        public void TranslateJudge(UpsertJudgeRequest request, Judge entity)
+        public void TranslateJudge(SaveJudgeRequest request, Judge entity)
         {
             entity.FirstName = request.FirstName;
             entity.LastName = request.LastName;
@@ -27,7 +27,7 @@ namespace CameraClub.Function.Entities
             entity.PhoneNumber = request.PhoneNumber;
         }
 
-        public void TranslatePhotographer(UpsertPhotographerRequest request, Photographer entity)
+        public void TranslatePhotographer(SavePhotographerRequest request, Photographer entity)
         {
             entity.FirstName = request.FirstName;
             entity.LastName = request.LastName;
@@ -36,7 +36,7 @@ namespace CameraClub.Function.Entities
             entity.ClubNumber = request.ClubNumber;
         }
 
-        public void TranslateClub(UpsertClubRequest request, Club entity)
+        public void TranslateClub(SaveClubRequest request, Club entity)
         {
             entity.Name = request.Name;
             entity.ContactName = request.ContactName;

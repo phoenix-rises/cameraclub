@@ -15,13 +15,13 @@ namespace CameraClub.Function
     public class CompetitionInfo
     {
         private readonly CompetitionContext competitionContext;
-        private readonly UpsertEntity upsertEntity;
+        private readonly SaveEntity SaveEntity;
         private readonly Translator translator;
 
-        public CompetitionInfo(CompetitionContext competitionContext, UpsertEntity upsertEntity, Translator translator)
+        public CompetitionInfo(CompetitionContext competitionContext, SaveEntity SaveEntity, Translator translator)
         {
             this.competitionContext = competitionContext;
-            this.upsertEntity = upsertEntity;
+            this.SaveEntity = SaveEntity;
             this.translator = translator;
         }
 
@@ -34,13 +34,13 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("UpsertCompetition")]
-        public async Task<IActionResult> UpsertCompetition(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertCompetitionRequest request, ILogger log)
+        [FunctionName("SaveCompetition")]
+        public async Task<IActionResult> SaveCompetition(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveCompetitionRequest request, ILogger log)
         {
-            if (!await this.upsertEntity.Upsert<UpsertCompetitionRequest, Competition>(this.competitionContext, request.Id, request, this.translator.TranslateCompetition))
+            if (!await this.SaveEntity.Save<SaveCompetitionRequest, Competition>(this.competitionContext, request.Id, request, this.translator.TranslateCompetition))
             {
-                return InvalidRequestResponse<UpsertCompetitionRequest>(request.Id.Value, log);
+                return InvalidRequestResponse<SaveCompetitionRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -57,13 +57,13 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("UpsertCategory")]
-        public async Task<IActionResult> UpsertCategory(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertCategoryRequest request, ILogger log)
+        [FunctionName("SaveCategory")]
+        public async Task<IActionResult> SaveCategory(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveCategoryRequest request, ILogger log)
         {
-            if (!await this.upsertEntity.Upsert<UpsertCategoryRequest, Category>(this.competitionContext, request.Id, request, this.translator.TranslateCategory))
+            if (!await this.SaveEntity.Save<SaveCategoryRequest, Category>(this.competitionContext, request.Id, request, this.translator.TranslateCategory))
             {
-                return InvalidRequestResponse<UpsertCategoryRequest>(request.Id.Value, log);
+                return InvalidRequestResponse<SaveCategoryRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -80,13 +80,13 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("UpsertJudges")]
-        public async Task<IActionResult> UpsertJudges(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertJudgeRequest request, ILogger log)
+        [FunctionName("SaveJudges")]
+        public async Task<IActionResult> SaveJudges(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveJudgeRequest request, ILogger log)
         {
-            if (!await this.upsertEntity.Upsert<UpsertJudgeRequest, Judge>(this.competitionContext, request.Id, request, this.translator.TranslateJudge))
+            if (!await this.SaveEntity.Save<SaveJudgeRequest, Judge>(this.competitionContext, request.Id, request, this.translator.TranslateJudge))
             {
-                return InvalidRequestResponse<UpsertJudgeRequest>(request.Id.Value, log);
+                return InvalidRequestResponse<SaveJudgeRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -103,13 +103,13 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("UpsertPhotographer")]
-        public async Task<IActionResult> UpsertPhotographer(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertPhotographerRequest request, ILogger log)
+        [FunctionName("SavePhotographer")]
+        public async Task<IActionResult> SavePhotographer(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SavePhotographerRequest request, ILogger log)
         {
-            if (!await this.upsertEntity.Upsert<UpsertPhotographerRequest, Photographer>(this.competitionContext, request.Id, request, this.translator.TranslatePhotographer))
+            if (!await this.SaveEntity.Save<SavePhotographerRequest, Photographer>(this.competitionContext, request.Id, request, this.translator.TranslatePhotographer))
             {
-                return InvalidRequestResponse<UpsertPhotographerRequest>(request.Id.Value, log);
+                return InvalidRequestResponse<SavePhotographerRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();
@@ -126,13 +126,13 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("UpsertClub")]
-        public async Task<IActionResult> UpsertClub(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] UpsertClubRequest request, ILogger log)
+        [FunctionName("SaveClub")]
+        public async Task<IActionResult> SaveClub(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveClubRequest request, ILogger log)
         {
-            if (!await this.upsertEntity.Upsert<UpsertClubRequest, Club>(this.competitionContext, request.Id, request, this.translator.TranslateClub))
+            if (!await this.SaveEntity.Save<SaveClubRequest, Club>(this.competitionContext, request.Id, request, this.translator.TranslateClub))
             {
-                return InvalidRequestResponse<UpsertClubRequest>(request.Id.Value, log);
+                return InvalidRequestResponse<SaveClubRequest>(request.Id.Value, log);
             }
 
             this.competitionContext.SaveChanges();

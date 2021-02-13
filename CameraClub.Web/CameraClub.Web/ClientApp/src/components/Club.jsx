@@ -1,8 +1,6 @@
 ﻿import React, { Component } from 'react';
 
 export class Club extends Component {
-    static displayName = Club.name;
-
     render() {
         return (
             <div>

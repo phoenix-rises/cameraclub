@@ -2,7 +2,7 @@
 
 namespace CameraClub.Function.Contracts
 {
-    public class UpsertCompetitionRequest
+    public class SaveCompetitionRequest
     {
         public int? Id { get; set; }
 

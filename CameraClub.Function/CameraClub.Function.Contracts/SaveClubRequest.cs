@@ -1,6 +1,6 @@
 ﻿namespace CameraClub.Function.Contracts
 {
-    public class UpsertClubRequest
+    public class SaveClubRequest
     {
         public int? Id { get; set; }
 

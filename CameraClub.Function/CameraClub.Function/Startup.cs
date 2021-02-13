@@ -12,7 +12,7 @@ namespace CameraClub.Function
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddDbContext<CompetitionContext>(optionBuilder => optionBuilder.UseSqlServer("name=SQLConnectionString"));
-            builder.Services.AddScoped<UpsertEntity>();
+            builder.Services.AddScoped<SaveEntity>();
             builder.Services.AddScoped<Translator>();
         }
     }

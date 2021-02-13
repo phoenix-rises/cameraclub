@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace CameraClub.Function
 {
-    public class UpsertEntity
+    public class SaveEntity
     {
-        public async Task<bool> Upsert<R, E>(CompetitionContext competitionContext, int? id, R request, Action<R, E> translate)
+        public async Task<bool> Save<R, E>(CompetitionContext competitionContext, int? id, R request, Action<R, E> translate)
             where R : class
             where E : class, new()
         {

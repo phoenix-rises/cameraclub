@@ -1,6 +1,6 @@
 ﻿namespace CameraClub.Function.Contracts
 {
-    public class UpsertPhotographerRequest
+    public class SaveJudgeRequest
     {
         public int? Id { get; set; }
 
@@ -8,10 +8,10 @@
 
         public string LastName { get; set; }
 
-        public string CompetitionNumber { get; set; }
-
         public string Email { get; set; }
 
-        public string ClubNumber { get; set; }
+        public string Bio { get; set; }
+
+        public string PhoneNumber { get; set; }
     }
 }

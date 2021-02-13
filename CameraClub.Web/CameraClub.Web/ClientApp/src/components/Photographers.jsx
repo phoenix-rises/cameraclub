@@ -51,7 +51,6 @@ export class Photographers extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null,
             isModalVisible: false
         });
     }
@@ -83,7 +82,7 @@ export class Photographers extends Component {
     }
 
     handleSave = (photographer) => {
-        this.clubApi.save("UpsertPhotographer", photographer, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("SavePhotographer", photographer, this.translate, this.hideModal, this.showError);
     }
 
     getPhotographerData() {

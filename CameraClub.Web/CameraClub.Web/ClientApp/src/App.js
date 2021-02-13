@@ -21,7 +21,7 @@ export default class App extends Component {
                 <Route exact path='/Categories' component={Categories} />
                 <Route exact path='/Club' component={Club} />
                 <Route exact path='/Judges' component={Judges} />
-                <Route exact path='/CompetitionPhotographers' component={CompetitionPhotographers} />
+                <Route exact path='/CompetitionPhotographers/:competitionId' component={CompetitionPhotographers} />
             </Layout>
         );
     }

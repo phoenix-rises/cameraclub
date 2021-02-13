@@ -51,7 +51,6 @@ export class Competitions extends Component {
             loading: false,
             error: true,
             errorMessage: error,
-            userApprovals: null,
             isModalVisible: false
         });
     }
@@ -124,13 +123,13 @@ export class Competitions extends Component {
                                                 <button className="btn btn-link" onClick={(e) => { e.preventDefault(); this.showModal(competition); }}>Edit</button>
                                             </Col>
                                             <Col>
-                                                <a className="btn btn-link" href={"/CompetitionPhotographers?competitionId=" + competition.id}>Photographers</a>
+                                                <a className="btn btn-link" href={"/CompetitionPhotographers/" + competition.id}>Photographers</a>
                                             </Col>
                                             <Col>
-                                                <a className="btn btn-link" href={"/Scores?competitionId=" + competition.id}>Scores</a>
+                                                <a className="btn btn-link" href={"/Scores/" + competition.id}>Scores</a>
                                             </Col>
                                             <Col>
-                                                <a className="btn btn-link" href={"/Present?competitionId=" + competition.id}>Present</a>
+                                                <a className="btn btn-link" href={"/Present/" + competition.id}>Present</a>
                                             </Col>
                                             <Col></Col>
                                             <Col></Col>
