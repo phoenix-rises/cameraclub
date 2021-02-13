@@ -1,6 +1,8 @@
 ﻿import React, { Component } from 'react';
-import { Container, Row, Col, Label } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import { ClubApi } from '../ClubApi';
+import { AddPhotographerEntry } from './AddPhotographerEntry';
+import { PhotographerEntry } from './PhotographerEntry';
 
 export class CompetitionPhotographers extends Component {
     clubApi;
@@ -14,21 +16,27 @@ export class CompetitionPhotographers extends Component {
 
         this.state = {
             competitionId: competitionId,
-            photographerData: [],
+            competitionInfo: { "name": "", "hasDigital": false, "hasPrint": false },
+            photographers: [],
+            photos: [],
             categories: [],
+            newPhotographerId: "0",
+            newPhotoId: "0",
             error: false,
             loading: true,
             errorMessage: ""
         }
 
-        this.loadPhotographerState = this.loadPhotographerState.bind(this);
+        this.loadEntriesState = this.loadEntriesState.bind(this);
         this.loadCategoryState = this.loadCategoryState.bind(this);
         this.showError = this.showError.bind(this);
         this.addPhoto = this.addPhoto.bind(this);
         this.removePhoto = this.removePhoto.bind(this);
         this.uploadPhoto = this.uploadPhoto.bind(this);
         this.addPhotographer = this.addPhotographer.bind(this);
-        this.handleChange = this.handleChange.bind(this);
+        this.handleTitleChange = this.handleTitleChange.bind(this);
+        this.handleCategoryChange = this.handleCategoryChange.bind(this);
+        this.viewPhoto = this.viewPhoto.bind(this);
     }
 
     componentDidMount() {
@@ -43,33 +51,34 @@ export class CompetitionPhotographers extends Component {
         this.setState({ "categories": categories });
 
         var test = {
-            "competitionName": "Spring Extravaganza",
+            "competitionInfo": { "name": "Spring Extravaganza", "hasDigital": true, "hasPrint": true },
             "photographers":
                 [
-                    {
-                        "id": "1", "firstName": "Bob", "lastName": "Barker", "competitionNumber": "1234",
-                        "photos": [{ "id": 1, "title": "outdoor stuff", "categoryId": "1" },
-                        { "id": 2, "title": "people stuff", "categoryId": "2" }]
-                    },
-                    {
-                        "id": "2", "firstName": "Jeff", "lastName": "McGee", "competitionNumber": "1234",
-                        "photos": [{ "id": 3, "title": "Jeff's photo", "categoryId": "1" },
-                        { "id": 4, "title": "Jeff's second photo", "categoryId": "2" }]
-                    }
+                    { "id": "1", "firstName": "Bob", "lastName": "Barker", "competitionNumber": "1234", "isDeleted": false },
+                    { "id": "2", "firstName": "Jeff", "lastName": "McGee", "competitionNumber": "5555", "isDeleted": false }
+                ],
+            "photos":
+                [
+                    { "photographerId": "1", "id": 1, "title": "outdoor stuff", "categoryId": "1", "fileGuid": "blah1", "isDeleted": false },
+                    { "photographerId": "1", "id": 2, "title": "people stuff", "categoryId": "2", "fileGuid": "blah2", "isDeleted": false },
+                    { "photographerId": "2", "id": 3, "title": "Jeff's photo", "categoryId": "1", "fileGuid": "blah3", "isDeleted": false },
+                    { "photographerId": "2", "id": 4, "title": "Jeff's second photo", "categoryId": "2", "fileGuid": "blah4", "isDeleted": false }
                 ]
         }
 
-        this.loadPhotographerState(test); // TODO: replace this with api call below
+        this.loadEntriesState(test); // TODO: replace this with api call below
 
         //this.clubApi.load("GetCompetitionEntries", this.showError, this.loadPhotographerState);
     }
 
-    loadPhotographerState(photographers) {
+    loadEntriesState(entryData) {
         this.setState({
             loading: false,
             error: false,
             errorMessage: null,
-            photographerData: photographers
+            competitionInfo: entryData.competitionInfo,
+            photographers: entryData.photographers,
+            photos: entryData.photos
         });
     }
 
@@ -83,95 +92,80 @@ export class CompetitionPhotographers extends Component {
     }
 
     addPhoto(photographerId) {
-        // TODO: create photo row... think this just means add it to state
+        let photos = [...this.state.photos];
+
+        var newId = this.state.newPhotoId - 1;
+        var newPhoto = { "photographerId": photographerId, "id": newId, "title": "", "categoryId": "", "fileGuid": "", "isDeleted": false }
+        photos.push(newPhoto);
+
+        this.setState({ "photos": photos, newPhotoId: newId });
     }
 
-    removePhoto(photo) {
-        // TODO:
+    removePhoto(photoId) {
+        let photos = [...this.state.photos];
+
+        var photoToUpdate = photos.find(p => p.id === photoId);
+        photoToUpdate.isDeleted = true;
+
+        this.setState({ "photos": photos });
     }
 
-    uploadPhoto(photo) {
-        // TODO:
+    uploadPhoto(photoId) {
+        // TODO: update state with filename or something... depends on how we handle photo uploading...
     }
 
-    addPhotographer() {
-        // TODO: update state for photographer
+    viewPhoto(photoId) {
+        // TODO: show photo, maybe in dialog or maybe in popup
+    }
+
+    addPhotographer(newPhotographer) {
+        let photographers = [...this.state.photographers];
+
+        newPhotographer.id = this.state.newPhotographerId - 1;
+        photographers.push(newPhotographer);
+
+        this.setState({ "photographers": photographers, newPhotographerId: newPhotographer.id });
     }
 
     save() {
         // TODO: call save api
     }
 
-    handleChange(event, photo) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
+    handleTitleChange(newTitle, photoId) {
+        let photos = [...this.state.photos];
 
-        // TODO: figure out how to update the state correctly
+        var photoToUpdate = photos.find(p => p.id === photoId);
+        photoToUpdate.title = newTitle;
 
-        this.setState({
-            [name]: value
-        });
+        this.setState({"photos": photos});
     }
 
-    renderCompetitionPhotographers() {
+    handleCategoryChange(newCategory, photoId) {
+        let photos = [...this.state.photos];
+
+        var photoToUpdate = photos.find(p => p.id === photoId);
+        photoToUpdate.categoryId = newCategory;
+
+        this.setState({ "photos": photos });
+    }
+
+    renderCompetitionEntries() {
         return (
             <>
                 <Row>
                     <Col>
-                        <h1 className="page-title">Entries for {this.state.photographerData.competitionName}</h1>
+                        <h1 className="page-title">Entries for {this.state.competitionInfo.name}</h1>
                     </Col>
                 </Row>
+                <AddPhotographerEntry addPhotographer={this.addPhotographer} />
                 <Row>
-                    <Col className="modal-header">
-                        <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); this.addPhotographer(); }}>Add Photographer</button>
-                    </Col>
-                </Row>
-                <Row>
-                    {this.state.photographerData.photographers.map(photographer =>
-                        <Container key={photographer.id} className="bs-callout bs-callout-info">
-                            <Row>
-                                <Col>
-                                    <h4 className="info">{photographer.firstName + " " + photographer.lastName}</h4>
-                                </Col>
-                                <Col>
-                                    Competition Number: {photographer.competitionNumber}
-                                </Col>
-                                <Col>
-                                    <button className="btn btn-secondary" onClick={(e) => { e.preventDefault(); this.addPhoto(photographer.id); }}>Add Photo</button>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col>
-                                    <Container>
-                                        {this.state.photographerData.photographers.find(p => p.id === photographer.id).photos.map(photo =>
-                                            <Row key={photo.id}>
-                                                <Label for="title" sm={1}>Title</Label>
-                                                <Col sm={4}>
-                                                    <input type="text" name="title" placeholder="Title of photo" value={photo.title} onChange={(e) => { this.handleChange(e, photo); }} />
-                                                </Col>
-                                                <Col sm={3}>
-                                                    <select value={photo.categoryId} onChange={(e) => { this.handleChange(e, photo); }}>
-                                                        {this.state.categories.map(category =>
-                                                            <option key={photo.id + " " + category.id} value={category.id}>
-                                                                {category.name}
-                                                            </option>
-                                                        )}
-                                                    </select>
-                                                </Col>
-                                                <Col sm={4}>
-                                                    <button className="btn btn-sm btn-outline-primary" onClick={(e) => { e.preventDefault(); this.uploadPhoto(e, photo); }}>Upload</button>
-                                                    <button className="btn btn-sm btn-outline-secondary" onClick={(e) => { e.preventDefault(); this.removePhoto(e, photo); }}>Remove</button>
-                                                </Col>
-                                            </Row>
-                                        )}
-                                    </Container>
-                                </Col>
-                            </Row>
-                        </Container>
+                    {this.state.photographers.filter(p => !p.isDeleted).map(photographer =>
+                        <PhotographerEntry key={photographer.id} photographer={photographer} photos={this.state.photos} categories={this.state.categories}
+                            handleTitleChange={this.handleTitleChange} handleCategoryChange={this.handleCategoryChange}
+                            addPhoto={this.addPhoto} uploadPhoto={this.uploadPhoto} removePhoto={this.removePhoto} />
                     )}
                 </Row>
-                <Row>
+                <Row className="top-margin-spacing">
                     <Col className="modal-footer">
                         <a className="btn btn-secondary" href={"/"}>Cancel</a>
                         <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); this.save(); }}>Save Changes</button>
@@ -186,7 +180,7 @@ export class CompetitionPhotographers extends Component {
             ? <p>Error:  <span dangerouslySetInnerHTML={{ __html: this.state.errorMessage }}></span></p>
             : this.state.loading
                 ? <p><em>Loading...</em></p>
-                : this.renderCompetitionPhotographers();
+                : this.renderCompetitionEntries();
 
         return (
             <div>
