@@ -82,6 +82,10 @@ export class CompetitionPhotographers extends Component {
         });
     }
 
+    save() {
+        // TODO: call save api
+    }
+
     showError(error) {
         console.log(error);
         this.setState({
@@ -89,33 +93,6 @@ export class CompetitionPhotographers extends Component {
             error: true,
             errorMessage: error
         });
-    }
-
-    addPhoto(photographerId) {
-        let photos = [...this.state.photos];
-
-        var newId = this.state.newPhotoId - 1;
-        var newPhoto = { "photographerId": photographerId, "id": newId, "title": "", "categoryId": "", "fileGuid": "", "isDeleted": false }
-        photos.push(newPhoto);
-
-        this.setState({ "photos": photos, newPhotoId: newId });
-    }
-
-    removePhoto(photoId) {
-        let photos = [...this.state.photos];
-
-        var photoToUpdate = photos.find(p => p.id === photoId);
-        photoToUpdate.isDeleted = true;
-
-        this.setState({ "photos": photos });
-    }
-
-    uploadPhoto(photoId) {
-        // TODO: update state with filename or something... depends on how we handle photo uploading...
-    }
-
-    viewPhoto(photoId) {
-        // TODO: show photo, maybe in dialog or maybe in popup
     }
 
     addPhotographer(newPhotographer) {
@@ -127,24 +104,39 @@ export class CompetitionPhotographers extends Component {
         this.setState({ "photographers": photographers, newPhotographerId: newPhotographer.id });
     }
 
-    save() {
-        // TODO: call save api
+    addPhoto(photographerId) {
+        var newId = this.state.newPhotoId - 1;
+        var newPhoto = { "photographerId": photographerId, "id": newId, "title": "", "categoryId": "", "fileGuid": "", "isDeleted": false };
+        let photos = [...this.state.photos, newPhoto];
+
+        this.setState({ "photos": photos, newPhotoId: newId });
+    }
+
+    removePhoto(photoId) {
+        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.isDeleted = true });
+    }
+
+    uploadPhoto(photoId) {
+        // TODO: update state with filename or something... depends on how we handle photo uploading...
+    }
+
+    viewPhoto(photoId) {
+        // TODO: show photo, maybe in dialog or maybe in popup
     }
 
     handleTitleChange(newTitle, photoId) {
-        let photos = [...this.state.photos];
-
-        var photoToUpdate = photos.find(p => p.id === photoId);
-        photoToUpdate.title = newTitle;
-
-        this.setState({"photos": photos});
+        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.title = newTitle; });
     }
 
     handleCategoryChange(newCategory, photoId) {
+        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.categoryId = newCategory; });
+    }
+
+    updatePhotoState(photoId, updateMethod) {
         let photos = [...this.state.photos];
 
         var photoToUpdate = photos.find(p => p.id === photoId);
-        photoToUpdate.categoryId = newCategory;
+        updateMethod(photoToUpdate);
 
         this.setState({ "photos": photos });
     }
@@ -162,7 +154,7 @@ export class CompetitionPhotographers extends Component {
                     {this.state.photographers.filter(p => !p.isDeleted).map(photographer =>
                         <PhotographerEntry key={photographer.id} photographer={photographer} photos={this.state.photos} categories={this.state.categories}
                             handleTitleChange={this.handleTitleChange} handleCategoryChange={this.handleCategoryChange}
-                            addPhoto={this.addPhoto} uploadPhoto={this.uploadPhoto} removePhoto={this.removePhoto} />
+                            addPhoto={this.addPhoto} uploadPhoto={this.uploadPhoto} removePhoto={this.removePhoto} viewPhoto={this.viewPhoto} />
                     )}
                 </Row>
                 <Row className="top-margin-spacing">
