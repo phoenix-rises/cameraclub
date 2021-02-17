@@ -20,7 +20,6 @@ export class CompetitionPhotographers extends Component {
             photographers: [],
             photos: [],
             categories: [],
-            newPhotographerId: "0",
             newPhotoId: "0",
             error: false,
             loading: true,
@@ -98,10 +97,9 @@ export class CompetitionPhotographers extends Component {
     addPhotographer(newPhotographer) {
         let photographers = [...this.state.photographers];
 
-        newPhotographer.id = this.state.newPhotographerId - 1;
         photographers.push(newPhotographer);
 
-        this.setState({ "photographers": photographers, newPhotographerId: newPhotographer.id });
+        this.setState({ "photographers": photographers });
     }
 
     addPhoto(photographerId) {
