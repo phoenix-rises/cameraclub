@@ -19,6 +19,7 @@ export class AddPhotographerEntry extends Component {
 
     resultChosen(photographer) {
         this.props.addPhotographer(photographer);
+        this.hideModal();
     }
 
     hideModal() {

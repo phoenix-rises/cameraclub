@@ -42,8 +42,8 @@ export class PhotographerSearchModal extends Component {
         this.setState({ searchText: searchText });
     }
 
-    selectPhotographer(photographerId) {
-        this.props.resultChosen(photographerId); // TODO: need to change this to send entire photographer! Not just ID. Entire photographer record will get loaded
+    selectPhotographer(photographer) {
+        this.props.resultChosen(photographer);
     }
 
     renderSearchModal() {

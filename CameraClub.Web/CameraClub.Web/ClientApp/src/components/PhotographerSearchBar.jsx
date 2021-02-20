@@ -9,8 +9,8 @@ export class PhotographerSearchBar extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(nameValuePair) {
-        this.props.updateSearch(nameValuePair.value);
+    handleChange(searchValue) {
+        this.props.updateSearch(searchValue.search);
     }
 
     render() {

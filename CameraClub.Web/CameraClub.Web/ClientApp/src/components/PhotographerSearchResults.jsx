@@ -17,13 +17,13 @@ export class PhotographerSearchResults extends Component {
                         </thead>
                         <tbody>
                             {this.props.photographers
-                                .filter(p => p.firstName.includes(this.props.searchText) || p.lastName.includes(this.props.searchText)) // TODO: don't think this is working correctly.. debug
+                                .filter(p => p.firstName.toLowerCase().includes(this.props.searchText.toLowerCase()) || p.lastName.toLowerCase().includes(this.props.searchText.toLowerCase()))
                                 .map(result =>
                                     <tr key={result.id}>
                                         <td>{result.firstName}</td>
                                         <td>{result.lastName}</td>
                                         <td>{result.competitionNumber}</td>
-                                        <td><button className="btn btn-link" onClick={(e) => { e.preventDefault(); this.props.selectPhotographer(result.id); }}>Select</button></td>
+                                        <td><button className="btn btn-link" onClick={(e) => { e.preventDefault(); this.props.selectPhotographer(result); }}>Select</button></td>
                                     </tr>
                                 )}
                         </tbody>
