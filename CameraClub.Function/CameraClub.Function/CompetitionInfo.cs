@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using System.Linq;
@@ -26,7 +27,7 @@ namespace CameraClub.Function
         }
 
         [FunctionName("GetCompetitions")]
-        public async Task<IActionResult> GetCompetitions(
+        public IActionResult GetCompetitions(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
         {
             var responseMessage = this.competitionContext.Competitions.ToList();
@@ -49,7 +50,7 @@ namespace CameraClub.Function
         }
 
         [FunctionName("GetCategories")]
-        public async Task<IActionResult> GetCategories(
+        public IActionResult GetCategories(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
             var responseMessage = this.competitionContext.Categories.ToList();
@@ -72,7 +73,7 @@ namespace CameraClub.Function
         }
 
         [FunctionName("GetJudges")]
-        public async Task<IActionResult> GetJudges(
+        public IActionResult GetJudges(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
             var responseMessage = this.competitionContext.Judges.ToList();
@@ -95,7 +96,7 @@ namespace CameraClub.Function
         }
 
         [FunctionName("GetPhotographers")]
-        public async Task<IActionResult> GetPhotographers(
+        public IActionResult GetPhotographers(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
             var responseMessage = this.competitionContext.Photographers.ToList();
@@ -118,7 +119,7 @@ namespace CameraClub.Function
         }
 
         [FunctionName("GetClub")]
-        public async Task<IActionResult> GetClub(
+        public IActionResult GetClub(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
             var responseMessage = this.competitionContext.Clubs.FirstOrDefault();
@@ -138,6 +139,40 @@ namespace CameraClub.Function
             this.competitionContext.SaveChanges();
 
             return new OkResult();
+        }
+
+        [FunctionName("GetCompetitionEntries")]
+        public IActionResult GetCompetitionEntries(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] GetCompetitionEntriesRequest request, ILogger log)
+        {
+            var competition = this.competitionContext.Competitions
+                                .Where(c => c.Id == request.CompetitionId)
+                                .Select(s => new { s.Id, s.Name, s.HasDigital, s.HasPrint, s.Date })
+                                .FirstOrDefault();
+
+            if (competition == null)
+            {
+                return InvalidRequestResponse<GetCompetitionEntriesRequest>(request.CompetitionId, log);
+            }
+
+            var photographers = this.competitionContext.Photographers
+                                    .Where(p => p.CompetitionPhotographer.Any(c => c.CompetitionId == request.CompetitionId))
+                                    .Select(n => new { n.Id, n.FirstName, n.LastName, n.Email, n.ClubNumber, n.CompetitionNumber })
+                                    .ToList();
+
+            var photos = this.competitionContext.Photos
+                            .Where(h => h.CompetitionId == request.CompetitionId)
+                            .Select(p => new { p.Id, p.Title, p.PhotographerId, p.CompetitionId, p.CategoryId, p.StorageId })
+                            .ToList();
+
+            return new OkObjectResult(
+                    new
+                    {
+                        competition,
+                        photographers,
+                        photos
+                    }
+                );
         }
 
         private static IActionResult InvalidRequestResponse<T>(int id, ILogger log)

@@ -33,6 +33,7 @@ export class CompetitionPhotographers extends Component {
         this.removePhoto = this.removePhoto.bind(this);
         this.uploadPhoto = this.uploadPhoto.bind(this);
         this.addPhotographer = this.addPhotographer.bind(this);
+        this.removePhotographer = this.removePhotographer.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.viewPhoto = this.viewPhoto.bind(this);
@@ -49,39 +50,27 @@ export class CompetitionPhotographers extends Component {
     loadCategoryState(categories) {
         this.setState({ "categories": categories });
 
-        var test = {
-            "competitionInfo": { "name": "Spring Extravaganza", "hasDigital": true, "hasPrint": true },
-            "photographers":
-                [
-                    { "id": "1", "firstName": "Bob", "lastName": "Barker", "competitionNumber": "1234", "isDeleted": false },
-                    { "id": "2", "firstName": "Jeff", "lastName": "McGee", "competitionNumber": "5555", "isDeleted": false }
-                ],
-            "photos":
-                [
-                    { "photographerId": "1", "id": 1, "title": "outdoor stuff", "categoryId": "1", "fileGuid": "blah1", "isDeleted": false },
-                    { "photographerId": "1", "id": 2, "title": "people stuff", "categoryId": "2", "fileGuid": "blah2", "isDeleted": false },
-                    { "photographerId": "2", "id": 3, "title": "Jeff's photo", "categoryId": "1", "fileGuid": "blah3", "isDeleted": false },
-                    { "photographerId": "2", "id": 4, "title": "Jeff's second photo", "categoryId": "2", "fileGuid": "blah4", "isDeleted": false }
-                ]
-        }
-
-        this.loadEntriesState(test); // TODO: replace this with api call below
-
-        //this.clubApi.load("GetCompetitionEntries", this.showError, this.loadPhotographerState);
+        this.clubApi.load("GetCompetitionEntries?competitionId=" + this.state.competitionId, this.showError, this.loadEntriesState);
     }
 
     loadEntriesState(entryData) {
+        entryData.photographers.forEach((p) => p.isDeleted = false);
+        entryData.photos.forEach((p) => p.isDeleted = false);
+
         this.setState({
             loading: false,
             error: false,
             errorMessage: null,
-            competitionInfo: entryData.competitionInfo,
+            competitionInfo: entryData.competition,
             photographers: entryData.photographers,
             photos: entryData.photos
         });
     }
 
     save() {
+        console.log(this.state.photos[0].isDeleted);
+        console.log(this.state.photographers[0].isDeleted);
+
         // TODO: call save api
     }
 
@@ -98,6 +87,15 @@ export class CompetitionPhotographers extends Component {
         let photographers = [...this.state.photographers];
 
         photographers.push(newPhotographer);
+
+        this.setState({ "photographers": photographers });
+    }
+
+    removePhotographer(photographerId) {
+        let photographers = [...this.state.photographers];
+
+        var photographerToUpdate = photographers.find(p => p.id === photographerId);
+        photographerToUpdate.isDeleted = true;
 
         this.setState({ "photographers": photographers });
     }
@@ -144,7 +142,7 @@ export class CompetitionPhotographers extends Component {
             <>
                 <Row>
                     <Col>
-                        <h1 className="page-title">Entries for {this.state.competitionInfo.name}</h1>
+                        <h1 className="page-title">Entries for {this.state.competitionInfo.name} ({new Intl.DateTimeFormat('en-us').format(new Date(this.state.competitionInfo.date))})</h1>
                     </Col>
                 </Row>
                 <AddPhotographerEntry addPhotographer={this.addPhotographer} />
@@ -152,7 +150,7 @@ export class CompetitionPhotographers extends Component {
                     {this.state.photographers.filter(p => !p.isDeleted).map(photographer =>
                         <PhotographerEntry key={photographer.id} photographer={photographer} photos={this.state.photos} categories={this.state.categories}
                             handleTitleChange={this.handleTitleChange} handleCategoryChange={this.handleCategoryChange}
-                            addPhoto={this.addPhoto} uploadPhoto={this.uploadPhoto} removePhoto={this.removePhoto} viewPhoto={this.viewPhoto} />
+                            addPhoto={this.addPhoto} uploadPhoto={this.uploadPhoto} removePhoto={this.removePhoto} viewPhoto={this.viewPhoto} removePhotographer={this.removePhotographer} />
                     )}
                 </Row>
                 <Row className="top-margin-spacing">

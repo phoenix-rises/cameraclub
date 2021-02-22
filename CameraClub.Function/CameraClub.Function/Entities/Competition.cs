@@ -20,5 +20,7 @@ namespace CameraClub.Function.Entities
         public List<Photo> Photos { get; set; }
 
         public List<CompetitionJudge> CompetitionJudge { get; set; }
+
+        public List<CompetitionPhotographer> CompetitionPhotographer { get; set; }
     }
 }

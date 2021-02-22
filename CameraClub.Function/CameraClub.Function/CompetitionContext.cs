@@ -21,6 +21,8 @@ namespace CameraClub.Function
 
         public DbSet<Photographer> Photographers { get; set; }
 
+        public DbSet<CompetitionPhotographer> CompetitionPhotographer { get; set; }
+
         public DbSet<Photo> Photos { get; set; }
 
         public DbSet<PhotoScore> PhotoScores { get; set; }
@@ -32,23 +34,30 @@ namespace CameraClub.Function
             modelBuilder.Entity<Photo>()
                 .HasOne(p => p.Photographer);
             modelBuilder.Entity<Photo>()
-                .HasMany(p => p.PhotoScores);
+                .HasMany(ps => ps.PhotoScores);
 
             modelBuilder.Entity<Photographer>()
-                .HasKey(pk => pk.Id);
+                .HasKey(p => p.Id);
+            modelBuilder.Entity<Photographer>()
+                .HasMany(p => p.Photos);
 
             modelBuilder.Entity<PhotoScore>()
-                .HasKey(pk => new { pk.PhotoId, pk.JudgeId, pk.Round });
+                .HasKey(ps => new { ps.PhotoId, ps.JudgeId, ps.Round });
             modelBuilder.Entity<PhotoScore>()
-                .HasOne(j => j.Judge);
+                .HasOne(ps => ps.Judge);
 
             modelBuilder.Entity<CompetitionJudge>()
                 .HasKey(pk => new { pk.CompetitionId, pk.JudgeId });
 
+            modelBuilder.Entity<CompetitionPhotographer>()
+                .HasKey(cp => new { cp.CompetitionId, cp.PhotographerId });
+
             modelBuilder.Entity<Competition>()
                 .HasMany(c => c.CompetitionJudge);
             modelBuilder.Entity<Competition>()
-                .HasMany(p => p.Photos);
+                .HasMany(c => c.CompetitionPhotographer);
+            modelBuilder.Entity<Competition>()
+                .HasMany(c => c.Photos);
 
             modelBuilder.Entity<Judge>()
                 .HasMany(j => j.CompetitionJudge);

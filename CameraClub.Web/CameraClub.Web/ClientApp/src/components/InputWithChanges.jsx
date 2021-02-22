@@ -12,7 +12,7 @@ export class InputWithChanges extends Component {
     render() {
         return (
             <>
-                <input type={this.props.inputType} name={this.props.name} placeholder={this.props.placeholderText} value={this.props.value} onChange={(e) => { this.handleChange(e); }} />
+                <input className="form-control" type={this.props.inputType} name={this.props.name} placeholder={this.props.placeholderText} value={this.props.value} onChange={(e) => { this.handleChange(e); }} />
             </>
         );
     }

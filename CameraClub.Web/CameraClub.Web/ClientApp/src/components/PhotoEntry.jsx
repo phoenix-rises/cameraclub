@@ -25,8 +25,8 @@ export class PhotoEntry extends Component {
                     <Col sm={3}>
                         <InputWithChanges type="text" name="title" placeholder="Title of photo" value={this.props.title} onChangeInput={(data) => { this.props.handleTitleChange(data.title, this.props.id); }} />
                     </Col>
-                    <Col sm={3}>
-                        <select value={this.props.categoryId} onChange={(e) => { this.props.handleCategoryChange(e.target.value, this.props.id); }}>
+                    <Col sm={2}>
+                        <select className="form-control" value={this.props.categoryId} onChange={(e) => { this.props.handleCategoryChange(e.target.value, this.props.id); }}>
                             {this.props.categories.map(category =>
                                 <option key={this.props.id + " " + category.id} value={category.id}>
                                     {category.name}
@@ -34,14 +34,14 @@ export class PhotoEntry extends Component {
                             )}
                         </select>
                     </Col>
-                    <Col sm={1}>
-                        <button className="btn btn-sm btn-outline-primary" onClick={(e) => { e.preventDefault(); this.uploadPhoto(); }}>Upload</button>
+                    <Col sm={2}>
+                        <button className="btn btn-sm btn-outline-primary form-control" onClick={(e) => { e.preventDefault(); this.uploadPhoto(); }}>Upload</button>
                     </Col>
-                    <Col sm={1}>
-                        <button className="btn btn-sm btn-outline-info" onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>View</button>
+                    <Col sm={2}>
+                        <button className="btn btn-sm btn-outline-info form-control" onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>View</button>
                     </Col>
-                    <Col sm={1}>
-                        <button className="btn btn-sm btn-outline-secondary" onClick={(e) => { e.preventDefault(); this.props.removePhoto(this.props.id); }}>Remove</button>
+                    <Col sm={2}>
+                        <button className="btn btn-sm btn-outline-secondary form-control" onClick={(e) => { e.preventDefault(); this.props.removePhoto(this.props.id); }}>Remove</button>
                     </Col>
                 </Row>
             </>

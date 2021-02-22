@@ -17,7 +17,9 @@ namespace CameraClub.Function.Entities
 
         public int CategoryId { get; set; }
 
-        public Guid StorageId { get; set; }
+        public Guid? StorageId { get; set; }
+
+        public Competition Competition { get; set; }
 
         public Photographer Photographer { get; set; }
 
