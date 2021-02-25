@@ -8,7 +8,7 @@
     save = (urlAction, data, translate, showError) => {
         var url = this.baseUrl + urlAction;
 
-        if (data.id !== null) {
+        if (data.id) {
             fetch(url,
                 {
                     method: "PUT",

@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+
+using CompetitionEntity = CameraClub.Function.Entities.Competition;
+using PhotographerEntity = CameraClub.Function.Entities.Photographer;
 
 namespace CameraClub.Function
 {
@@ -39,7 +42,7 @@ namespace CameraClub.Function
         public async Task<IActionResult> SaveCompetition(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveCompetitionRequest request, ILogger log)
         {
-            if (!await this.SaveEntity.Save<SaveCompetitionRequest, Competition>(this.competitionContext, request.Id, request, this.translator.TranslateCompetition))
+            if (!await this.SaveEntity.Save<SaveCompetitionRequest, CompetitionEntity>(this.competitionContext, request.Id, request, this.translator.TranslateCompetition))
             {
                 return InvalidRequestResponse<SaveCompetitionRequest>(request.Id.Value, log);
             }
@@ -108,7 +111,7 @@ namespace CameraClub.Function
         public async Task<IActionResult> SavePhotographer(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SavePhotographerRequest request, ILogger log)
         {
-            if (!await this.SaveEntity.Save<SavePhotographerRequest, Photographer>(this.competitionContext, request.Id, request, this.translator.TranslatePhotographer))
+            if (!await this.SaveEntity.Save<SavePhotographerRequest, PhotographerEntity>(this.competitionContext, request.Id, request, this.translator.TranslatePhotographer))
             {
                 return InvalidRequestResponse<SavePhotographerRequest>(request.Id.Value, log);
             }
@@ -173,6 +176,61 @@ namespace CameraClub.Function
                         photos
                     }
                 );
+        }
+
+        [FunctionName("SaveCompetitionEntries")]
+        public async Task<IActionResult> SaveCompetitionEntries(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = null)] SaveCompetitionEntriesRequest request, ILogger log)
+        {
+            try
+            {
+                var competition = await this.competitionContext.Competitions.FindAsync(request.CompetitionId);
+
+                if (competition == null)
+                {
+                    return InvalidRequestResponse<SaveCompetitionEntriesRequest>(request.CompetitionId, log);
+                }
+
+                var competitionPhotographers = this.competitionContext.CompetitionPhotographer.Where(cp => cp.CompetitionId == request.CompetitionId).ToList();
+
+                foreach (var photographer in competitionPhotographers.Where(cp => request.Photographers.Any(p => p.Id == cp.PhotographerId && p.IsDeleted)))
+                {
+                    this.competitionContext.Remove(photographer);
+                }
+
+                foreach (var photographer in request.Photographers.Where(p => !p.IsDeleted && !competitionPhotographers.Any(cp => cp.PhotographerId == p.Id)))
+                {
+                    this.competitionContext.CompetitionPhotographer.Add(new CompetitionPhotographer { CompetitionId = request.CompetitionId, PhotographerId = photographer.Id });
+                }
+
+                var photos = this.competitionContext.Photos.Where(p => p.CompetitionId == request.CompetitionId).ToList();
+
+                foreach (var photo in photos.Where(p => request.Photos.Any(ph => ph.Id == p.Id && ph.IsDeleted)))
+                {
+                    this.competitionContext.Remove(photo);
+                }
+
+                foreach (var photo in request.Photos.Where(ph => !ph.IsDeleted && !photos.Any(p => p.Id == ph.Id)))
+                {
+                    var newPhoto = new Entities.Photo
+                    {
+                        CompetitionId = request.CompetitionId,
+                        PhotographerId = photo.PhotographerId,
+                        CategoryId = photo.CategoryId,
+                        Title = photo.Title
+                    };
+                    this.competitionContext.Photos.Add(newPhoto);
+                }
+
+                await this.competitionContext.SaveChangesAsync();
+
+                return new OkResult();
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Error thrown when attempting to SaveCompetitionEntries");
+                throw;
+            }
         }
 
         private static IActionResult InvalidRequestResponse<T>(int id, ILogger log)
