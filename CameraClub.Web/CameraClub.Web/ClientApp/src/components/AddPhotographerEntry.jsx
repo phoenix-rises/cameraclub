@@ -34,7 +34,7 @@ export class AddPhotographerEntry extends Component {
                         <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); this.addPhotographer(); }}>Add Photographer</button>
                     </Col>
                 </Row>
-                <PhotographerSearchModal resultChosen={this.resultChosen} show={this.state.isModalVisible} handleClose={this.hideModal} />
+                <PhotographerSearchModal resultChosen={this.resultChosen} show={this.state.isModalVisible} handleClose={this.hideModal} currentPhotographers={this.props.currentPhotographers} />
             </>
         );
     }

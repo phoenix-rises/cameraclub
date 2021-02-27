@@ -150,7 +150,7 @@ export class CompetitionPhotographers extends Component {
                         <h1 className="page-title">Entries for {this.state.competitionInfo.name} ({new Intl.DateTimeFormat('en-us').format(new Date(this.state.competitionInfo.date))})</h1>
                     </Col>
                 </Row>
-                <AddPhotographerEntry addPhotographer={this.addPhotographer} />
+                <AddPhotographerEntry addPhotographer={this.addPhotographer} currentPhotographers={this.state.photographers} />
                 <Row>
                     {this.state.photographers.filter(p => !p.isDeleted).map(photographer =>
                         <PhotographerEntry key={photographer.id} photographer={photographer} photos={this.state.photos} categories={this.state.categories}

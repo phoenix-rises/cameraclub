@@ -10,7 +10,7 @@ export class PhotoEntry extends Component {
     }
 
     uploadPhoto() {
-        alert('should display file browing thing here');
+        alert('should display file browsing thing here');
 
         // TODO: display upload file browsing thing; determine if we are uploading now or on save.. think on save???
 
