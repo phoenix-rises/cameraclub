@@ -27,6 +27,8 @@ export class CompetitionPhotographers extends Component {
         }
 
         this.loadEntriesState = this.loadEntriesState.bind(this);
+        this.loadData = this.loadData.bind(this);
+        this.save = this.save.bind(this);
         this.loadCategoryState = this.loadCategoryState.bind(this);
         this.showError = this.showError.bind(this);
         this.addPhoto = this.addPhoto.bind(this);
@@ -68,10 +70,13 @@ export class CompetitionPhotographers extends Component {
     }
 
     save() {
-        console.log(this.state.photos[0].isDeleted);
-        console.log(this.state.photographers[0].isDeleted);
+        var saveData = {
+            "competitionId": this.state.competitionId,
+            "photographers": this.state.photographers,
+            "photos": this.state.photos
+        };
 
-        // TODO: call save api
+        this.clubApi.save("SaveCompetitionEntries", saveData, this.loadData, this.showError, true);
     }
 
     showError(error) {
@@ -102,7 +107,7 @@ export class CompetitionPhotographers extends Component {
 
     addPhoto(photographerId) {
         var newId = this.state.newPhotoId - 1;
-        var newPhoto = { "photographerId": photographerId, "id": newId, "title": "", "categoryId": "", "fileGuid": "", "isDeleted": false };
+        var newPhoto = { "id": newId, "competitionId": this.state.competitionId, "photographerId": photographerId, "title": "", "categoryId": "1", "storageId": "", "isDeleted": false };
         let photos = [...this.state.photos, newPhoto];
 
         this.setState({ "photos": photos, newPhotoId: newId });

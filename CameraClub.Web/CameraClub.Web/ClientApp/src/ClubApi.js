@@ -5,10 +5,10 @@
         this.baseUrl = process.env.REACT_APP_API_URL;
     }
 
-    save = (urlAction, data, translate, showError) => {
+    save = (urlAction, data, translate, showError, alwaysUpdate = false) => {
         var url = this.baseUrl + urlAction;
 
-        if (data.id) {
+        if (data.id || alwaysUpdate) {
             fetch(url,
                 {
                     method: "PUT",

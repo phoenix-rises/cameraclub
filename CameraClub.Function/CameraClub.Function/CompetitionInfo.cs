@@ -192,10 +192,21 @@ namespace CameraClub.Function
                 }
 
                 var competitionPhotographers = this.competitionContext.CompetitionPhotographer.Where(cp => cp.CompetitionId == request.CompetitionId).ToList();
+                var entityPhotos = this.competitionContext.Photos.Where(p => p.CompetitionId == request.CompetitionId).ToList();
 
                 foreach (var photographer in competitionPhotographers.Where(cp => request.Photographers.Any(p => p.Id == cp.PhotographerId && p.IsDeleted)))
                 {
                     this.competitionContext.Remove(photographer);
+
+                    entityPhotos.Where(e => e.PhotographerId == photographer.PhotographerId && e.CompetitionId == request.CompetitionId).ToList()
+                        .ForEach(p =>
+                            this.competitionContext.Remove(p)
+                        );
+
+                    request.Photos.Where(w => w.PhotographerId == photographer.PhotographerId).ToList()
+                                    .ForEach(h =>
+                                        request.Photos.Remove(h)
+                                    );
                 }
 
                 foreach (var photographer in request.Photographers.Where(p => !p.IsDeleted && !competitionPhotographers.Any(cp => cp.PhotographerId == p.Id)))
@@ -203,23 +214,34 @@ namespace CameraClub.Function
                     this.competitionContext.CompetitionPhotographer.Add(new CompetitionPhotographer { CompetitionId = request.CompetitionId, PhotographerId = photographer.Id });
                 }
 
-                var photos = this.competitionContext.Photos.Where(p => p.CompetitionId == request.CompetitionId).ToList();
 
-                foreach (var photo in photos.Where(p => request.Photos.Any(ph => ph.Id == p.Id && ph.IsDeleted)))
+                foreach (var requestPhoto in request.Photos)
                 {
-                    this.competitionContext.Remove(photo);
-                }
+                    var entityPhoto = entityPhotos.FirstOrDefault(p => p.Id == requestPhoto.Id);
 
-                foreach (var photo in request.Photos.Where(ph => !ph.IsDeleted && !photos.Any(p => p.Id == ph.Id)))
-                {
-                    var newPhoto = new Entities.Photo
+                    if (entityPhoto != null)
                     {
-                        CompetitionId = request.CompetitionId,
-                        PhotographerId = photo.PhotographerId,
-                        CategoryId = photo.CategoryId,
-                        Title = photo.Title
-                    };
-                    this.competitionContext.Photos.Add(newPhoto);
+                        if (requestPhoto.IsDeleted)
+                        {
+                            this.competitionContext.Remove(entityPhoto);
+                            continue;
+                        }
+
+                        entityPhoto.CategoryId = requestPhoto.CategoryId;
+                        entityPhoto.Title = requestPhoto.Title;
+                    }
+                    else if (!requestPhoto.IsDeleted)
+                    {
+                        var newPhoto = new Entities.Photo
+                        {
+                            CompetitionId = request.CompetitionId,
+                            PhotographerId = requestPhoto.PhotographerId,
+                            CategoryId = requestPhoto.CategoryId,
+                            Title = requestPhoto.Title
+                        };
+
+                        this.competitionContext.Photos.Add(newPhoto);
+                    }
                 }
 
                 await this.competitionContext.SaveChangesAsync();
