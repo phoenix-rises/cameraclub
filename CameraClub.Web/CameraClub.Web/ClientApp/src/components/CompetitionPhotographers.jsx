@@ -57,7 +57,7 @@ export class CompetitionPhotographers extends Component {
 
     loadEntriesState(entryData) {
         entryData.photographers.forEach((p) => p.isDeleted = false);
-        entryData.photos.forEach((p) => p.isDeleted = false);
+        entryData.photos.forEach((p) => { p.isDeleted = false; p.isDigital = this.state.categories.find(c => c.id === p.categoryId).isDigital; });
 
         this.setState({
             loading: false,
@@ -130,7 +130,9 @@ export class CompetitionPhotographers extends Component {
     }
 
     handleCategoryChange(newCategory, photoId) {
-        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.categoryId = newCategory; });
+        var isDigital = this.state.categories.find(c => c.id == newCategory).isDigital;
+
+        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.categoryId = newCategory; photoToUpdate.isDigital = isDigital; });
     }
 
     updatePhotoState(photoId, updateMethod) {

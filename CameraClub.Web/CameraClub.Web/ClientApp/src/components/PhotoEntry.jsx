@@ -35,10 +35,12 @@ export class PhotoEntry extends Component {
                         </select>
                     </Col>
                     <Col sm={2}>
-                        <button className="btn btn-sm btn-outline-primary form-control" onClick={(e) => { e.preventDefault(); this.uploadPhoto(); }}>Upload</button>
+                        <button className={this.props.isDigital ? "btn btn-sm btn-outline-primary form-control" : "invisible"}
+                            onClick={(e) => { e.preventDefault(); this.uploadPhoto(); }}>Upload</button>
                     </Col>
                     <Col sm={2}>
-                        <button className="btn btn-sm btn-outline-info form-control" onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>View</button>
+                        <button className={this.props.isDigital ? "btn btn-sm btn-outline-info form-control" : "invisible"}
+                            onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>View</button>
                     </Col>
                     <Col sm={2}>
                         <button className="btn btn-sm btn-outline-secondary form-control" onClick={(e) => { e.preventDefault(); this.props.removePhoto(this.props.id); }}>Remove</button>
