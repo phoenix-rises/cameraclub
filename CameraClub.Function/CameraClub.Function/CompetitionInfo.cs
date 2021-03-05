@@ -165,7 +165,7 @@ namespace CameraClub.Function
 
             var photos = this.competitionContext.Photos
                             .Where(h => h.CompetitionId == request.CompetitionId)
-                            .Select(p => new { p.Id, p.Title, p.PhotographerId, p.CompetitionId, p.CategoryId, p.StorageId })
+                            .Select(p => new { p.Id, p.Title, p.PhotographerId, p.CompetitionId, p.CategoryId, p.FileName })
                             .ToList();
 
             return new OkObjectResult(

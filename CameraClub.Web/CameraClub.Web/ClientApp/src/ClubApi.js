@@ -63,4 +63,25 @@
                 }
             );
     }
+
+    sendFormData = (urlAction, data, translate, showError) => {
+        var url = this.baseUrl + urlAction;
+
+        fetch(url,
+            {
+                method: "POST",
+                headers: {
+                    'Content-type': 'multipart/form-data'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(
+                (result) => {
+                    translate(data);
+                },
+                (error) => {
+                    showError(error);
+                }
+            );
+    }
 }

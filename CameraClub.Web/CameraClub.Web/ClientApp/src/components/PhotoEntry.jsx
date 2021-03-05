@@ -9,23 +9,28 @@ export class PhotoEntry extends Component {
         this.uploadPhoto = this.uploadPhoto.bind(this);
     }
 
-    uploadPhoto() {
-        alert('should display file browsing thing here');
+    uploadPhoto(fileData) {
+        var fileInfo = new FormData();
 
-        // TODO: display upload file browsing thing; determine if we are uploading now or on save.. think on save???
+        fileInfo.append(
+            "file",
+            fileData.target.files[0],
+            fileData.target.files[0].name
+        );
 
-        this.props.uploadPhoto(this.props.id);
+        this.props.uploadPhoto(this.props.id, fileInfo);
     }
 
     render() {
         return (
             <>
-                <Row className="top-margin-spacing">
-                    <Label for="title" sm={1}>Title</Label>
+                <Row className="align-items-end">
                     <Col sm={3}>
+                        <Label for="title">Title</Label>
                         <InputWithChanges type="text" name="title" placeholder="Title of photo" value={this.props.title} onChangeInput={(data) => { this.props.handleTitleChange(data.title, this.props.id); }} />
                     </Col>
                     <Col sm={2}>
+                        <Label for="title">Category</Label>
                         <select className="form-control" value={this.props.categoryId} onChange={(e) => { this.props.handleCategoryChange(e.target.value, this.props.id); }}>
                             {this.props.categories.map(category =>
                                 <option key={this.props.id + " " + category.id} value={category.id}>
@@ -35,12 +40,12 @@ export class PhotoEntry extends Component {
                         </select>
                     </Col>
                     <Col sm={2}>
-                        <button className={this.props.isDigital ? "btn btn-sm btn-outline-primary form-control" : "invisible"}
-                            onClick={(e) => { e.preventDefault(); this.uploadPhoto(); }}>Upload</button>
-                    </Col>
-                    <Col sm={2}>
-                        <button className={this.props.isDigital ? "btn btn-sm btn-outline-info form-control" : "invisible"}
+                        <button className={this.props.isDigital && this.props.fileName ? "btn btn-sm btn-outline-info form-control" : "invisible"}
                             onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>View</button>
+                    </Col>
+                    <Col sm={3}>
+                        <Label for="filePicker" className={this.props.isDigital && this.props.fileName ? "visible" : "invisible"}>Current File: {this.props.fileName}</Label>
+                        <input id="filePicker" type="file" className={this.props.isDigital ? "visible" : "invisible"} onChange={(e) => { this.uploadPhoto(e); }} />
                     </Col>
                     <Col sm={2}>
                         <button className="btn btn-sm btn-outline-secondary form-control" onClick={(e) => { e.preventDefault(); this.props.removePhoto(this.props.id); }}>Remove</button>

@@ -27,11 +27,11 @@ export class PhotographerEntry extends Component {
                         <Col>
                             <Container>
                                 {this.props.photos.filter(p => p.photographerId === this.props.photographer.id && !p.isDeleted).map(photo =>
-                                    <PhotoEntry key={photo.id} id={photo.id} categories={this.props.categories}
+                                    <PhotoEntry key={photo.id} id={photo.id} categories={this.props.categories} fileName={photo.fileName}
                                         title={photo.title} categoryId={photo.categoryId} isDigital={photo.isDigital}
                                         handleTitleChange={this.props.handleTitleChange} handleCategoryChange={this.props.handleCategoryChange}
-                                        uploadPhoto={(photoId) => { this.props.uploadPhoto(photoId); }} viewPhoto={(photoId) => { this.props.viewPhoto(photoId); }}
-                                        removePhoto={(photoId) => { this.props.removePhoto(photoId); }} />
+                                        uploadPhoto={this.props.uploadPhoto} viewPhoto={this.props.viewPhoto}
+                                        removePhoto={this.props.removePhoto} />
                                 )}
                             </Container>
                         </Col>

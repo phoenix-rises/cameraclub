@@ -19,6 +19,8 @@ namespace CameraClub.Function.Entities
 
         public Guid? StorageId { get; set; }
 
+        public string FileName { get; set; }
+
         public Competition Competition { get; set; }
 
         public Photographer Photographer { get; set; }
