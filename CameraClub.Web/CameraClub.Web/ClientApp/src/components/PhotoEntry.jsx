@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Row, Col, Label } from 'reactstrap';
+import { Col, Label, Container } from 'reactstrap';
 import { InputWithChanges } from './InputWithChanges';
 
 export class PhotoEntry extends Component {
@@ -23,14 +23,29 @@ export class PhotoEntry extends Component {
 
     render() {
         return (
-            <>
-                <Row className="align-items-end">
+            <Container className="card mb-3">
+                <div className="card-body align-baseline pl-0 pr-0 form-row">
+                    <Col sm={1}>
+                        <Container>
+                            <div className="form-row">
+                                <Col sm={2}>
+                                    <button type="button" className="close" aria-label="Close" onClick={(e) => { e.preventDefault(); this.props.removePhoto(this.props.id); }}>
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </Col>
+                                <Col sm={10} className="text-right">
+                                    <Label className="form-control-plaintext" for="title">Title</Label>
+                                </Col>
+                            </div>
+                        </Container>
+                    </Col>
                     <Col sm={3}>
-                        <Label for="title">Title</Label>
                         <InputWithChanges type="text" name="title" placeholder="Title of photo" value={this.props.title} onChangeInput={(data) => { this.props.handleTitleChange(data.title, this.props.id); }} />
                     </Col>
+                    <Col sm={1} className="text-right">
+                        <Label for="title" className="form-control-plaintext">Category</Label>
+                    </Col>
                     <Col sm={2}>
-                        <Label for="title">Category</Label>
                         <select className="form-control" value={this.props.categoryId} onChange={(e) => { this.props.handleCategoryChange(e.target.value, this.props.id); }}>
                             {this.props.categories.map(category =>
                                 <option key={this.props.id + " " + category.id} value={category.id}>
@@ -40,18 +55,14 @@ export class PhotoEntry extends Component {
                         </select>
                     </Col>
                     <Col sm={2}>
-                        <button className={this.props.isDigital && this.props.fileName ? "btn btn-sm btn-outline-info form-control" : "invisible"}
-                            onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>View</button>
+                        <button className={this.props.isDigital && this.props.fileName ? "btn btn-sm btn-link" : "invisible"}
+                            onClick={(e) => { e.preventDefault(); this.props.viewPhoto(this.props.id); }}>{this.props.fileName}</button>
                     </Col>
                     <Col sm={3}>
-                        <Label for="filePicker" className={this.props.isDigital && this.props.fileName ? "visible" : "invisible"}>Current File: {this.props.fileName}</Label>
                         <input id="filePicker" type="file" className={this.props.isDigital ? "visible" : "invisible"} onChange={(e) => { this.uploadPhoto(e); }} />
                     </Col>
-                    <Col sm={2}>
-                        <button className="btn btn-sm btn-outline-secondary form-control" onClick={(e) => { e.preventDefault(); this.props.removePhoto(this.props.id); }}>Remove</button>
-                    </Col>
-                </Row>
-            </>
+                </div>
+            </Container>
         );
     }
 }

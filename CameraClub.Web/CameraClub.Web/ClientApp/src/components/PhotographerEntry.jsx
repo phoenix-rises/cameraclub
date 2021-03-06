@@ -23,9 +23,9 @@ export class PhotographerEntry extends Component {
                             <button className="btn btn-sm btn-secondary form-control" onClick={(e) => { e.preventDefault(); this.props.addPhoto(this.props.photographer.id); }}>Add Photo</button>
                         </Col>
                     </Row>
-                    <Row className="card-body">
+                    <Row className="card-body pl-0 pr-0">
                         <Col>
-                            <Container>
+                            <Container className="pl-0 pr-0">
                                 {this.props.photos.filter(p => p.photographerId === this.props.photographer.id && !p.isDeleted).map(photo =>
                                     <PhotoEntry key={photo.id} id={photo.id} categories={this.props.categories} fileName={photo.fileName}
                                         title={photo.title} categoryId={photo.categoryId} isDigital={photo.isDigital}
