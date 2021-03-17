@@ -1,3 +1,5 @@
+using Azure.Storage.Blobs;
+
 using CameraClub.Function.Contracts;
 using CameraClub.Function.Entities;
 
@@ -8,10 +10,13 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 using CompetitionEntity = CameraClub.Function.Entities.Competition;
+using PhotoEntity = CameraClub.Function.Entities.Photo;
 using PhotographerEntity = CameraClub.Function.Entities.Photographer;
 
 namespace CameraClub.Function
@@ -21,15 +26,17 @@ namespace CameraClub.Function
         private readonly CompetitionContext competitionContext;
         private readonly SaveEntity SaveEntity;
         private readonly Translator translator;
+        private readonly Lazy<BlobServiceClient> blobServiceClient;
 
-        public CompetitionInfo(CompetitionContext competitionContext, SaveEntity SaveEntity, Translator translator)
+        public CompetitionInfo(CompetitionContext competitionContext, SaveEntity SaveEntity, Translator translator, Lazy<BlobServiceClient> blobServiceClient)
         {
             this.competitionContext = competitionContext;
             this.SaveEntity = SaveEntity;
             this.translator = translator;
+            this.blobServiceClient = blobServiceClient;
         }
 
-        [FunctionName("GetCompetitions")]
+        [FunctionName(nameof(GetCompetitions))]
         public IActionResult GetCompetitions(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
         {
@@ -38,7 +45,7 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("SaveCompetition")]
+        [FunctionName(nameof(SaveCompetition))]
         public async Task<IActionResult> SaveCompetition(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveCompetitionRequest request, ILogger log)
         {
@@ -52,7 +59,7 @@ namespace CameraClub.Function
             return new OkResult();
         }
 
-        [FunctionName("GetCategories")]
+        [FunctionName(nameof(GetCategories))]
         public IActionResult GetCategories(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
@@ -61,7 +68,7 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("SaveCategory")]
+        [FunctionName(nameof(SaveCategory))]
         public async Task<IActionResult> SaveCategory(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveCategoryRequest request, ILogger log)
         {
@@ -75,7 +82,7 @@ namespace CameraClub.Function
             return new OkResult();
         }
 
-        [FunctionName("GetJudges")]
+        [FunctionName(nameof(GetJudges))]
         public IActionResult GetJudges(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
@@ -84,7 +91,7 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("SaveJudges")]
+        [FunctionName(nameof(SaveJudges))]
         public async Task<IActionResult> SaveJudges(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveJudgeRequest request, ILogger log)
         {
@@ -98,7 +105,7 @@ namespace CameraClub.Function
             return new OkResult();
         }
 
-        [FunctionName("GetPhotographers")]
+        [FunctionName(nameof(GetPhotographers))]
         public IActionResult GetPhotographers(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
@@ -107,7 +114,7 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("SavePhotographer")]
+        [FunctionName(nameof(SavePhotographer))]
         public async Task<IActionResult> SavePhotographer(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SavePhotographerRequest request, ILogger log)
         {
@@ -121,7 +128,7 @@ namespace CameraClub.Function
             return new OkResult();
         }
 
-        [FunctionName("GetClub")]
+        [FunctionName(nameof(GetClub))]
         public IActionResult GetClub(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
@@ -130,7 +137,7 @@ namespace CameraClub.Function
             return new OkObjectResult(responseMessage);
         }
 
-        [FunctionName("SaveClub")]
+        [FunctionName(nameof(SaveClub))]
         public async Task<IActionResult> SaveClub(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", "post", Route = null)] SaveClubRequest request, ILogger log)
         {
@@ -144,7 +151,7 @@ namespace CameraClub.Function
             return new OkResult();
         }
 
-        [FunctionName("GetCompetitionEntries")]
+        [FunctionName(nameof(GetCompetitionEntries))]
         public IActionResult GetCompetitionEntries(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] GetCompetitionEntriesRequest request, ILogger log)
         {
@@ -178,7 +185,7 @@ namespace CameraClub.Function
                 );
         }
 
-        [FunctionName("SaveCompetitionEntries")]
+        [FunctionName(nameof(SaveCompetitionEntries))]
         public async Task<IActionResult> SaveCompetitionEntries(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = null)] SaveCompetitionEntriesRequest request, ILogger log)
         {
@@ -194,55 +201,9 @@ namespace CameraClub.Function
                 var competitionPhotographers = this.competitionContext.CompetitionPhotographer.Where(cp => cp.CompetitionId == request.CompetitionId).ToList();
                 var entityPhotos = this.competitionContext.Photos.Where(p => p.CompetitionId == request.CompetitionId).ToList();
 
-                foreach (var photographer in competitionPhotographers.Where(cp => request.Photographers.Any(p => p.Id == cp.PhotographerId && p.IsDeleted)))
-                {
-                    this.competitionContext.Remove(photographer);
+                this.UpdatePhotographers(request, competitionPhotographers, entityPhotos);
 
-                    entityPhotos.Where(e => e.PhotographerId == photographer.PhotographerId && e.CompetitionId == request.CompetitionId).ToList()
-                        .ForEach(p =>
-                            this.competitionContext.Remove(p)
-                        );
-
-                    request.Photos.Where(w => w.PhotographerId == photographer.PhotographerId).ToList()
-                                    .ForEach(h =>
-                                        request.Photos.Remove(h)
-                                    );
-                }
-
-                foreach (var photographer in request.Photographers.Where(p => !p.IsDeleted && !competitionPhotographers.Any(cp => cp.PhotographerId == p.Id)))
-                {
-                    this.competitionContext.CompetitionPhotographer.Add(new CompetitionPhotographer { CompetitionId = request.CompetitionId, PhotographerId = photographer.Id });
-                }
-
-
-                foreach (var requestPhoto in request.Photos)
-                {
-                    var entityPhoto = entityPhotos.FirstOrDefault(p => p.Id == requestPhoto.Id);
-
-                    if (entityPhoto != null)
-                    {
-                        if (requestPhoto.IsDeleted)
-                        {
-                            this.competitionContext.Remove(entityPhoto);
-                            continue;
-                        }
-
-                        entityPhoto.CategoryId = requestPhoto.CategoryId;
-                        entityPhoto.Title = requestPhoto.Title;
-                    }
-                    else if (!requestPhoto.IsDeleted)
-                    {
-                        var newPhoto = new Entities.Photo
-                        {
-                            CompetitionId = request.CompetitionId,
-                            PhotographerId = requestPhoto.PhotographerId,
-                            CategoryId = requestPhoto.CategoryId,
-                            Title = requestPhoto.Title
-                        };
-
-                        this.competitionContext.Photos.Add(newPhoto);
-                    }
-                }
+                this.SavePhotos(request, entityPhotos);
 
                 await this.competitionContext.SaveChangesAsync();
 
@@ -255,11 +216,115 @@ namespace CameraClub.Function
             }
         }
 
+        public void UpdatePhotographers(SaveCompetitionEntriesRequest request, List<CompetitionPhotographer> competitionPhotographers, List<PhotoEntity> entityPhotos)
+        {
+            foreach (var photographer in competitionPhotographers.Where(cp => request.Photographers.Any(p => p.Id == cp.PhotographerId && p.IsDeleted)))
+            {
+                this.competitionContext.Remove(photographer);
+
+                entityPhotos.Where(e => e.PhotographerId == photographer.PhotographerId && e.CompetitionId == request.CompetitionId).ToList()
+                    .ForEach(p =>
+                        this.competitionContext.Remove(p)
+                    );
+
+                request.Photos.Where(w => w.PhotographerId == photographer.PhotographerId).ToList()
+                                .ForEach(h =>
+                                    request.Photos.Remove(h)
+                                );
+            }
+
+            foreach (var photographer in request.Photographers.Where(p => !p.IsDeleted && !competitionPhotographers.Any(cp => cp.PhotographerId == p.Id)))
+            {
+                this.competitionContext.CompetitionPhotographer.Add(new CompetitionPhotographer { CompetitionId = request.CompetitionId, PhotographerId = photographer.Id });
+            }
+        }
+
+        public void SavePhotos(SaveCompetitionEntriesRequest request, List<PhotoEntity> entityPhotos)
+        {
+            foreach (var requestPhoto in request.Photos)
+            {
+                var entityPhoto = entityPhotos.FirstOrDefault(p => p.Id == requestPhoto.Id);
+
+                if (entityPhoto != null)
+                {
+                    if (requestPhoto.IsDeleted)
+                    {
+                        this.competitionContext.Remove(entityPhoto);
+                        continue;
+                    }
+
+                    entityPhoto.CategoryId = requestPhoto.CategoryId;
+                    entityPhoto.Title = requestPhoto.Title;
+                }
+                else if (!requestPhoto.IsDeleted)
+                {
+                    var newPhoto = new Entities.Photo
+                    {
+                        CompetitionId = request.CompetitionId,
+                        PhotographerId = requestPhoto.PhotographerId,
+                        CategoryId = requestPhoto.CategoryId,
+                        Title = requestPhoto.Title
+                    };
+
+                    this.competitionContext.Photos.Add(newPhoto);
+                }
+            }
+        }
+
+        [FunctionName(nameof(UploadPhotoFile))]
+        [RequestFormLimits(MultipartBodyLengthLimit = 1000000)]
+        public async Task<IActionResult> UploadPhotoFile(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest request, ILogger log)
+        {
+            var storageId = Guid.NewGuid().ToString();
+
+            using (var stream = new MemoryStream())
+            {
+                var file = request.Form.Files.FirstOrDefault();
+
+                if (file == null)
+                {
+                    log.LogInformation("Request for file upload without any file.");
+                    return new BadRequestResult();
+                }
+
+                await file.CopyToAsync(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var blobContainerClient = this.blobServiceClient.Value.GetBlobContainerClient("photos");
+                var blobClient = blobContainerClient.GetBlobClient(storageId);
+
+                await blobClient.UploadAsync(stream);
+            }
+
+            return new OkResult();
+        }
+
+        [FunctionName(nameof(DownloadPhotoFile))]
+        public async Task<Stream> DownloadPhotoFile(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] DownloadPhotoFileRequest request, ILogger log)
+        {
+            var blobContainerClient = this.blobServiceClient.Value.GetBlobContainerClient("photos");
+            var blobClient = blobContainerClient.GetBlobClient(request.StorageId);
+
+            if (!blobClient.Exists())
+            {
+                log.LogInformation($"Request made to find for image was not found. Request's storage id was {request.StorageId}");
+                return null;
+            }
+
+            var memoryStream = new MemoryStream();
+            await blobClient.DownloadToAsync(memoryStream);
+            memoryStream.Position = 0;
+
+            return memoryStream;
+        }
+
         private static IActionResult InvalidRequestResponse<T>(int id, ILogger log)
         {
             log.LogInformation($"Request of type {typeof(T).Name} made with an invalid Id {id}");
 
-            return new NotFoundResult();
+            return new BadRequestResult();
         }
     }
 }
