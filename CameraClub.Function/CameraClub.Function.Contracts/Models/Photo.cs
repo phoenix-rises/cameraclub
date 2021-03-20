@@ -14,6 +14,8 @@ namespace CameraClub.Function.Contracts
 
         public int CategoryId { get; set; }
 
+        public string FileName { get; set; }
+
         public Guid? StorageId { get; set; }
 
         public bool IsDeleted { get; set; }

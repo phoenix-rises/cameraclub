@@ -19,7 +19,6 @@ export class CompetitionPhotographers extends Component {
             competitionInfo: { "name": "", "hasDigital": false, "hasPrint": false },
             photographers: [],
             photos: [],
-            photoFiles: [],
             categories: [],
             newPhotoId: "0",
             error: false,
@@ -30,7 +29,6 @@ export class CompetitionPhotographers extends Component {
         this.loadEntriesState = this.loadEntriesState.bind(this);
         this.loadData = this.loadData.bind(this);
         this.save = this.save.bind(this);
-        this.savePhotos = this.savePhotos.bind(this);
         this.loadCategoryState = this.loadCategoryState.bind(this);
         this.showError = this.showError.bind(this);
         this.addPhoto = this.addPhoto.bind(this);
@@ -40,7 +38,6 @@ export class CompetitionPhotographers extends Component {
         this.removePhotographer = this.removePhotographer.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
-        this.viewPhoto = this.viewPhoto.bind(this);
     }
 
     componentDidMount() {
@@ -71,18 +68,18 @@ export class CompetitionPhotographers extends Component {
         });
     }
 
-    save() {
+    async save() {
         var saveData = {
             "competitionId": this.state.competitionId,
             "photographers": this.state.photographers,
             "photos": this.state.photos
         };
 
-        this.clubApi.save("SaveCompetitionEntries", saveData, this.savePhotos, this.showError, true);
-    }
+        var saveResponse = await this.clubApi.saveWithPut("SaveCompetitionEntries", saveData);
 
-    savePhotos() {
-        //this.clubApi.sendFormData("UploadPhotoFiles", saveData, this.loadData, this.showError);
+        if (!saveResponse.ok) {
+            this.showError("An error was encountered saving the data. Please try again.");
+        }
     }
 
     showError(error) {
@@ -113,36 +110,32 @@ export class CompetitionPhotographers extends Component {
 
     addPhoto(photographerId) {
         var newId = this.state.newPhotoId - 1;
-        var newPhoto = { "id": newId, "competitionId": this.state.competitionId, "photographerId": photographerId, "title": "", "categoryId": "1", "fileName": "", "isDeleted": false };
+        var newPhoto = { "id": newId, "competitionId": this.state.competitionId, "photographerId": photographerId, "title": "", "categoryId": "1", "fileName": "", "storageId": "", "isDeleted": false };
         let photos = [...this.state.photos, newPhoto];
 
         this.setState({ "photos": photos, newPhotoId: newId });
     }
 
     removePhoto(photoId) {
-        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.isDeleted = true });
+        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.isDeleted = true; });
     }
 
-    uploadPhoto(photoId, fileInfo) {
-        let photoFiles = [...this.state.photoFiles];
+    async uploadPhoto(photoId, fileName, fileInfo) {
+        var fileResponse = await this.clubApi.saveFormData("UploadPhotoFile", fileInfo);
 
-        var fileToUpdate = photoFiles.find(f => f.photoId == photoId);
-
-        if (fileToUpdate) {
-            fileToUpdate.fileInfo = fileInfo;
-        }
-        else {
-            var newFile = { "photoId": photoId, "fileInfo": fileInfo };
-            photoFiles.push(newFile);
+        if (!fileResponse.ok) {
+            this.showError("An error was encountered uploading the files. Please try again.");
+            return;
         }
 
-        this.setState({ "photoFiles": photoFiles });
+        var jsonResponse = await fileResponse.json();
 
-        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.fileName = fileInfo.get("file").name });
-    }
+        if (!jsonResponse.storageId) {
+            this.showError("An error was encountered uploading the files. Please try again.");
+            return;
+        }
 
-    viewPhoto(photoId) {
-        // TODO: show photo, maybe in dialog or maybe in popup
+        this.updatePhotoState(photoId, (photoToUpdate) => { photoToUpdate.fileName = fileName; photoToUpdate.storageId = jsonResponse.storageId; });
     }
 
     handleTitleChange(newTitle, photoId) {

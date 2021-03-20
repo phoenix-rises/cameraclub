@@ -64,24 +64,30 @@
             );
     }
 
-    sendFormData = (urlAction, data, translate, showError) => {
+    async saveWithPut(urlAction, data) {
         var url = this.baseUrl + urlAction;
 
-        fetch(url,
+        const response = await fetch(url,
             {
-                method: "POST",
+                method: "PUT",
                 headers: {
-                    'Content-type': 'multipart/form-data'
+                    'Content-type': 'application/json'
                 },
                 body: JSON.stringify(data)
-            })
-            .then(
-                (result) => {
-                    translate(data);
-                },
-                (error) => {
-                    showError(error);
-                }
-            );
+            });
+
+        return response;
+    }
+
+    async saveFormData(urlAction, data) {
+        var url = this.baseUrl + urlAction;
+
+        const response = await fetch(url,
+            {
+                method: "POST",
+                body: data
+            });
+
+        return response;
     }
 }

@@ -172,7 +172,7 @@ namespace CameraClub.Function
 
             var photos = this.competitionContext.Photos
                             .Where(h => h.CompetitionId == request.CompetitionId)
-                            .Select(p => new { p.Id, p.Title, p.PhotographerId, p.CompetitionId, p.CategoryId, p.FileName })
+                            .Select(p => new { p.Id, p.Title, p.PhotographerId, p.CompetitionId, p.CategoryId, p.FileName, p.StorageId })
                             .ToList();
 
             return new OkObjectResult(
@@ -203,7 +203,7 @@ namespace CameraClub.Function
 
                 this.UpdatePhotographers(request, competitionPhotographers, entityPhotos);
 
-                this.SavePhotos(request, entityPhotos);
+                this.UpdatePhotos(request, entityPhotos);
 
                 await this.competitionContext.SaveChangesAsync();
 
@@ -239,7 +239,7 @@ namespace CameraClub.Function
             }
         }
 
-        public void SavePhotos(SaveCompetitionEntriesRequest request, List<PhotoEntity> entityPhotos)
+        public void UpdatePhotos(SaveCompetitionEntriesRequest request, List<PhotoEntity> entityPhotos)
         {
             foreach (var requestPhoto in request.Photos)
             {
@@ -255,6 +255,8 @@ namespace CameraClub.Function
 
                     entityPhoto.CategoryId = requestPhoto.CategoryId;
                     entityPhoto.Title = requestPhoto.Title;
+                    entityPhoto.FileName = requestPhoto.FileName;
+                    entityPhoto.StorageId = requestPhoto.StorageId;
                 }
                 else if (!requestPhoto.IsDeleted)
                 {
@@ -263,7 +265,9 @@ namespace CameraClub.Function
                         CompetitionId = request.CompetitionId,
                         PhotographerId = requestPhoto.PhotographerId,
                         CategoryId = requestPhoto.CategoryId,
-                        Title = requestPhoto.Title
+                        Title = requestPhoto.Title,
+                        FileName = requestPhoto.FileName,
+                        StorageId = requestPhoto.StorageId
                     };
 
                     this.competitionContext.Photos.Add(newPhoto);
@@ -297,7 +301,11 @@ namespace CameraClub.Function
                 await blobClient.UploadAsync(stream);
             }
 
-            return new OkResult();
+            return new OkObjectResult(
+                new
+                {
+                    storageId
+                });
         }
 
         [FunctionName(nameof(DownloadPhotoFile))]
