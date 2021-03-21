@@ -14,7 +14,7 @@ export class PhotoModal extends Component {
     render() {
         return (
             <div className={this.props.show ? "modal display-block" : "modal display-none"}>
-                <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">{this.props.photoData.title}</h5>
@@ -25,7 +25,7 @@ export class PhotoModal extends Component {
                         <Container className="modal-body">
                             <Row>
                                 <Col>
-                                    <img src={this.clubApi.baseUrl + "DownloadPhotoFile?StorageId=" + this.props.photoData.storageId} alt={this.props.photoData.title} />
+                                    <img width="100%" src={this.clubApi.baseUrl + "DownloadPhotoFile?StorageId=" + this.props.photoData.storageId} alt={this.props.photoData.title} />
                                 </Col>
                             </Row>
                         </Container>

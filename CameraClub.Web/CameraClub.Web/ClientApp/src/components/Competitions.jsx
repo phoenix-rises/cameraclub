@@ -68,6 +68,8 @@ export class Competitions extends Component {
         }
 
         this.hideModal();
+
+        this.getCompetitionData();
     }
 
     loadState(competitions) {
@@ -81,7 +83,7 @@ export class Competitions extends Component {
     }
 
     handleSave = (competition) => {
-        this.clubApi.save("UpsertCompetition", competition, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("SaveCompetition", competition, this.translate, this.hideModal, this.showError);
     }
 
     getCompetitionData() {

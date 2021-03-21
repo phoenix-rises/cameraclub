@@ -59,7 +59,7 @@ export class PhotographerSearchModal extends Component {
                         </div>
                         <Container className="modal-body">
                             <PhotographerSearchBar updateSearch={this.updateSearch} />
-                            <PhotographerSearchResults photographers={this.state.photographers.filter(p => this.props.currentPhotographers.every(s => s.id !== p.id))} searchText={this.state.searchText} selectPhotographer={this.selectPhotographer} />
+                            <PhotographerSearchResults photographers={this.state.photographers.filter(p => this.props.currentPhotographers.some(t => t.id === p.id && p.isDeleted) || this.props.currentPhotographers.every(s => s.id !== p.id))} searchText={this.state.searchText} selectPhotographer={this.selectPhotographer} />
                         </Container>
                         <div className="modal-footer">
                             <button className="btn btn-secondary" onClick={this.props.handleClose}>Close</button>

@@ -40,7 +40,7 @@ namespace CameraClub.Function
         public IActionResult GetCompetitions(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
         {
-            var responseMessage = this.competitionContext.Competitions.ToList();
+            var responseMessage = this.competitionContext.Competitions.OrderByDescending(c => c.Date).ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -63,7 +63,7 @@ namespace CameraClub.Function
         public IActionResult GetCategories(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
-            var responseMessage = this.competitionContext.Categories.ToList();
+            var responseMessage = this.competitionContext.Categories.OrderBy(c => c.Name).ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -86,7 +86,7 @@ namespace CameraClub.Function
         public IActionResult GetJudges(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
-            var responseMessage = this.competitionContext.Judges.ToList();
+            var responseMessage = this.competitionContext.Judges.OrderBy(j => j.FirstName).ThenBy(j => j.LastName).ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -109,7 +109,7 @@ namespace CameraClub.Function
         public IActionResult GetPhotographers(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
-            var responseMessage = this.competitionContext.Photographers.ToList();
+            var responseMessage = this.competitionContext.Photographers.OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -168,11 +168,14 @@ namespace CameraClub.Function
             var photographers = this.competitionContext.Photographers
                                     .Where(p => p.CompetitionPhotographer.Any(c => c.CompetitionId == request.CompetitionId))
                                     .Select(n => new { n.Id, n.FirstName, n.LastName, n.Email, n.ClubNumber, n.CompetitionNumber })
+                                    .OrderBy(p => p.FirstName)
+                                    .ThenBy(p => p.LastName)
                                     .ToList();
 
             var photos = this.competitionContext.Photos
                             .Where(h => h.CompetitionId == request.CompetitionId)
                             .Select(p => new { p.Id, p.Title, p.PhotographerId, p.CompetitionId, p.CategoryId, p.FileName, p.StorageId })
+                            .OrderBy(p => p.Title)
                             .ToList();
 
             return new OkObjectResult(

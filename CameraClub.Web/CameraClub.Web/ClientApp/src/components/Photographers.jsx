@@ -69,6 +69,8 @@ export class Photographers extends Component {
         }
 
         this.hideModal();
+
+        this.getPhotographerData();
     }
 
     loadState(photographers) {

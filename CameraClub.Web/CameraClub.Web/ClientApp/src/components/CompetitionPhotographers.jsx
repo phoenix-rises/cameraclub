@@ -79,7 +79,10 @@ export class CompetitionPhotographers extends Component {
 
         if (!saveResponse.ok) {
             this.showError("An error was encountered saving the data. Please try again.");
+            return;
         }
+
+        this.loadData();
     }
 
     showError(error) {
@@ -110,7 +113,8 @@ export class CompetitionPhotographers extends Component {
 
     addPhoto(photographerId) {
         var newId = this.state.newPhotoId - 1;
-        var newPhoto = { "id": newId, "competitionId": this.state.competitionId, "photographerId": photographerId, "title": "", "categoryId": "1", "fileName": "", "storageId": "", "isDeleted": false };
+        var isDigital = this.state.categories.find(c => c.id == "1").isDigital;
+        var newPhoto = { "id": newId, "competitionId": this.state.competitionId, "photographerId": photographerId, "title": "", "categoryId": "1", "fileName": "", "storageId": "", "isDigital": isDigital, "isDeleted": false };
         let photos = [...this.state.photos, newPhoto];
 
         this.setState({ "photos": photos, newPhotoId: newId });

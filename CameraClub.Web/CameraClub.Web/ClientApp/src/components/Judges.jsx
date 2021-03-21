@@ -69,6 +69,8 @@ export class Judges extends Component {
         }
 
         this.hideModal();
+
+        this.getJudgeData();
     }
 
     loadState(judges) {
@@ -82,7 +84,7 @@ export class Judges extends Component {
     }
 
     handleSave = (judge) => {
-        this.clubApi.save("UpsertJudges", judge, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("SaveJudges", judge, this.translate, this.hideModal, this.showError);
     }
 
     getJudgeData() {

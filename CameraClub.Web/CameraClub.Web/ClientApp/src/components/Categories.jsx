@@ -31,7 +31,7 @@ export class Categories extends Component {
 
     showModal = (category) => {
         if (category === null) {
-            category = { "id": null, "name": "", "isDigital": false };
+            category = { "id": null, "name": "", "isDigital": true };
         }
 
         this.setState(
@@ -66,6 +66,8 @@ export class Categories extends Component {
         }
 
         this.hideModal();
+
+        this.getCategoryData();
     }
 
     loadState(categories) {
@@ -79,7 +81,7 @@ export class Categories extends Component {
     }
 
     handleSave = (competition) => {
-        this.clubApi.save("UpsertCategory", competition, this.translate, this.hideModal, this.showError);
+        this.clubApi.save("SaveCategory", competition, this.translate, this.hideModal, this.showError);
     }
 
     getCategoryData() {
