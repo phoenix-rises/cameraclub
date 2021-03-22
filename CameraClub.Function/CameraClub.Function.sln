@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraClub.Function", "CameraClub.Function\CameraClub.Function.csproj", "{278A8DA8-C1F2-48C0-B288-CAAB2D53C46C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CameraClub.Function", "CameraClub.Function\CameraClub.Function.csproj", "{278A8DA8-C1F2-48C0-B288-CAAB2D53C46C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraClub.Function.Contracts", "CameraClub.Function.Contracts\CameraClub.Function.Contracts.csproj", "{7DCC92EA-B746-483D-9468-743F7DE62134}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CameraClub.Function.Contracts", "CameraClub.Function.Contracts\CameraClub.Function.Contracts.csproj", "{7DCC92EA-B746-483D-9468-743F7DE62134}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraClub.Function.Tests", "CameraClub.Function.Tests\CameraClub.Function.Tests.csproj", "{84177F7F-1D4D-4D1E-A3AD-BE864F786548}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7DCC92EA-B746-483D-9468-743F7DE62134}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DCC92EA-B746-483D-9468-743F7DE62134}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DCC92EA-B746-483D-9468-743F7DE62134}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84177F7F-1D4D-4D1E-A3AD-BE864F786548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84177F7F-1D4D-4D1E-A3AD-BE864F786548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84177F7F-1D4D-4D1E-A3AD-BE864F786548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84177F7F-1D4D-4D1E-A3AD-BE864F786548}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

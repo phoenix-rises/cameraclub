@@ -6,26 +6,31 @@ namespace CameraClub.Function
 {
     public class CompetitionContext : DbContext
     {
+        public CompetitionContext()
+        {
+            // Needed for Mock
+        }
+
         public CompetitionContext(DbContextOptions<CompetitionContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Competition> Competitions { get; set; }
+        public virtual DbSet<Competition> Competitions { get; set; }
 
-        public DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
 
-        public DbSet<Club> Clubs { get; set; }
+        public virtual DbSet<Club> Clubs { get; set; }
 
-        public DbSet<Judge> Judges { get; set; }
+        public virtual DbSet<Judge> Judges { get; set; }
 
-        public DbSet<Photographer> Photographers { get; set; }
+        public virtual DbSet<Photographer> Photographers { get; set; }
 
-        public DbSet<CompetitionPhotographer> CompetitionPhotographer { get; set; }
+        public virtual DbSet<CompetitionPhotographer> CompetitionPhotographer { get; set; }
 
-        public DbSet<Photo> Photos { get; set; }
+        public virtual DbSet<Photo> Photos { get; set; }
 
-        public DbSet<PhotoScore> PhotoScores { get; set; }
+        public virtual DbSet<PhotoScore> PhotoScores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
