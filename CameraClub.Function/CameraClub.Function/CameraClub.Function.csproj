@@ -14,6 +14,9 @@
     <ProjectReference Include="..\CameraClub.Function.Contracts\CameraClub.Function.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>CameraClub.Function.Tests</_Parameter1>
+    </AssemblyAttribute>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
