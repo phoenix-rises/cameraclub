@@ -3,6 +3,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using Moq;
+
+using System.Collections.Generic;
+using System.Linq;
+
 namespace CameraClub.Function.Tests
 {
     [TestClass]
@@ -71,6 +76,28 @@ namespace CameraClub.Function.Tests
             Assert.AreEqual("Test 4", entries.photos[3].Title);
             Assert.AreEqual(3, entries.photos[3].PhotographerId);
             Assert.AreEqual(2, entries.photos[3].CategoryId);
+        }
+
+        [TestMethod]
+        public void SaveCompetitionEntriesReturnsErrorResponse()
+        {
+            var request = new SaveCompetitionEntriesRequest
+            {
+                CompetitionId = 99,
+                Photographers = new List<Photographer> { new Photographer { Id = 1, IsDeleted = false } },
+                Photos = new List<Photo> { new Photo { Id = 1, IsDeleted = false } }
+            };
+
+            this.testData.dbContext.Setup(d => d.FindAsync<Entities.Competition>(It.IsAny<int>())).Returns(null);
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SaveCompetitionEntries(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as BadRequestResult;
+
+            Assert.IsNotNull(result);
+
+            Assert.IsFalse(this.testData.dbContext.Invocations.Any(v => v.Method.Name == "SaveChanges"));
         }
     }
 }

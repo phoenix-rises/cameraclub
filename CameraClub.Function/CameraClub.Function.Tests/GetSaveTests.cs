@@ -50,7 +50,7 @@ namespace CameraClub.Function.Tests
                 Name = "Updated"
             };
 
-            var updatedCategory = this.testData.testCategories.Where(c => c.Id == 2).First();
+            var updatedCategory = this.testData.testCategories.First(c => c.Id == request.Id);
 
             this.testData.dbContext.Setup(d => d.FindAsync<Category>(It.IsAny<int>())).Returns(new ValueTask<Category>(updatedCategory));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
@@ -65,6 +65,49 @@ namespace CameraClub.Function.Tests
             Assert.IsFalse(updatedCategory.IsDigital);
 
             this.testData.dbContext.Verify();
+        }
+
+        [TestMethod]
+        public void CanAddCategory()
+        {
+            var request = new Contracts.SaveCategoryRequest
+            {
+                IsDigital = true,
+                Name = "Added"
+            };
+
+            this.testData.dbContext.Setup(d => d.Add(It.IsAny<Category>())).Verifiable();
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SaveCategory(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as OkResult;
+
+            Assert.IsNotNull(result);
+
+            this.testData.dbContext.Verify();
+        }
+
+        [TestMethod]
+        public void SaveCategoriesReturnsErrorResponse()
+        {
+            var request = new Contracts.SaveCategoryRequest
+            {
+                Id = 99,
+                IsDigital = false,
+                Name = "Updated"
+            };
+
+            this.testData.dbContext.Setup(d => d.FindAsync<Category>(It.IsAny<int>())).Returns(null);
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SaveCategory(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as BadRequestResult;
+
+            Assert.IsNotNull(result);
+
+            Assert.IsFalse(this.testData.dbContext.Invocations.Any(v => v.Method.Name == "SaveChanges"));
         }
 
         [TestMethod]
@@ -101,7 +144,7 @@ namespace CameraClub.Function.Tests
                 HasPrint = false
             };
 
-            var updatedCompetition = this.testData.testCompetitions.Where(c => c.Id == 2).First();
+            var updatedCompetition = this.testData.testCompetitions.First(c => c.Id == 2);
 
             this.testData.dbContext.Setup(d => d.FindAsync<Competition>(It.IsAny<int>())).Returns(new ValueTask<Competition>(updatedCompetition));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
@@ -120,6 +163,30 @@ namespace CameraClub.Function.Tests
             Assert.AreEqual(10, updatedCompetition.Date.Day);
 
             this.testData.dbContext.Verify();
+        }
+
+        [TestMethod]
+        public void SaveCompetitionsReturnsErrorResponse()
+        {
+            var request = new Contracts.SaveCompetitionRequest
+            {
+                Id = 99,
+                Date = new DateTime(2022, 2, 10),
+                Name = "Updated",
+                HasDigital = false,
+                HasPrint = false
+            };
+
+            this.testData.dbContext.Setup(d => d.FindAsync<Competition>(It.IsAny<int>())).Returns(null);
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SaveCompetition(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as BadRequestResult;
+
+            Assert.IsNotNull(result);
+
+            Assert.IsFalse(this.testData.dbContext.Invocations.Any(v => v.Method.Name == "SaveChanges"));
         }
 
         [TestMethod]
@@ -153,7 +220,7 @@ namespace CameraClub.Function.Tests
                 PhoneNumber = "2227779999"
             };
 
-            var updatedJudge = this.testData.testJudges.Where(c => c.Id == 3).First();
+            var updatedJudge = this.testData.testJudges.First(c => c.Id == request.Id);
 
             this.testData.dbContext.Setup(d => d.FindAsync<Judge>(It.IsAny<int>())).Returns(new ValueTask<Judge>(updatedJudge));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
@@ -170,6 +237,30 @@ namespace CameraClub.Function.Tests
             Assert.AreEqual("2227779999", updatedJudge.PhoneNumber);
 
             this.testData.dbContext.Verify();
+        }
+
+        [TestMethod]
+        public void SaveJudgesReturnsErrorResponse()
+        {
+            var request = new Contracts.SaveJudgeRequest
+            {
+                Id = 99,
+                FirstName = "UpdatedFirst",
+                LastName = "UpdatedLast",
+                Email = "Updated@gmail.com",
+                PhoneNumber = "2227779999"
+            };
+
+            this.testData.dbContext.Setup(d => d.FindAsync<Judge>(It.IsAny<int>())).Returns(null);
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SaveJudges(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as BadRequestResult;
+
+            Assert.IsNotNull(result);
+
+            Assert.IsFalse(this.testData.dbContext.Invocations.Any(v => v.Method.Name == "SaveChanges"));
         }
 
         [TestMethod]
@@ -203,7 +294,7 @@ namespace CameraClub.Function.Tests
                 CompetitionNumber = "111"
             };
 
-            var updatedPhotographer = this.testData.testPhotographers.Where(c => c.Id == 3).First();
+            var updatedPhotographer = this.testData.testPhotographers.First(c => c.Id == request.Id);
 
             this.testData.dbContext.Setup(d => d.FindAsync<Photographer>(It.IsAny<int>())).Returns(new ValueTask<Photographer>(updatedPhotographer));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
@@ -220,6 +311,30 @@ namespace CameraClub.Function.Tests
             Assert.AreEqual("111", updatedPhotographer.CompetitionNumber);
 
             this.testData.dbContext.Verify();
+        }
+
+        [TestMethod]
+        public void SavePhotographersReturnsErrorResponse()
+        {
+            var request = new Contracts.SavePhotographerRequest
+            {
+                Id = 99,
+                FirstName = "First",
+                LastName = "Last",
+                Email = "test@gmail.com",
+                CompetitionNumber = "111"
+            };
+
+            this.testData.dbContext.Setup(d => d.FindAsync<Photographer>(It.IsAny<int>())).Returns(null);
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SavePhotographer(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as BadRequestResult;
+
+            Assert.IsNotNull(result);
+
+            Assert.IsFalse(this.testData.dbContext.Invocations.Any(v => v.Method.Name == "SaveChanges"));
         }
 
         [TestMethod]
@@ -250,7 +365,7 @@ namespace CameraClub.Function.Tests
                 ClubAssociationNumber = "222"
             };
 
-            var updatedClub = this.testData.testClubs.Where(c => c.Id == 1).First();
+            var updatedClub = this.testData.testClubs.First(c => c.Id == request.Id);
 
             this.testData.dbContext.Setup(d => d.FindAsync<Club>(It.IsAny<int>())).Returns(new ValueTask<Club>(updatedClub));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
@@ -267,6 +382,30 @@ namespace CameraClub.Function.Tests
             Assert.AreEqual("222", updatedClub.ClubAssociationNumber);
 
             this.testData.dbContext.Verify();
+        }
+
+        [TestMethod]
+        public void SaveClubReturnsErrorResponse()
+        {
+            var request = new Contracts.SaveClubRequest
+            {
+                Id = 99,
+                Name = "update",
+                ContactEmail = "test@test.com",
+                ContactName = "me",
+                ClubAssociationNumber = "999"
+            };
+
+            this.testData.dbContext.Setup(d => d.FindAsync<Club>(It.IsAny<int>())).Returns(null);
+            this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
+
+            var response = this.testData.competitionInfo.SaveClub(request, this.testData.logger.Object).GetAwaiter();
+
+            var result = response.GetResult() as BadRequestResult;
+
+            Assert.IsNotNull(result);
+
+            Assert.IsFalse(this.testData.dbContext.Invocations.Any(v => v.Method.Name == "SaveChanges"));
         }
     }
 }
