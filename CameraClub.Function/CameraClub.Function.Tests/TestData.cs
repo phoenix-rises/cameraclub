@@ -16,7 +16,6 @@ namespace CameraClub.Function.Tests
     public class TestData
     {
         public readonly Mock<CompetitionContext> dbContext = new Mock<CompetitionContext>();
-        public readonly Mock<Lazy<BlobServiceClient>> blobServiceClient = new Mock<Lazy<BlobServiceClient>>();
         public readonly Mock<HttpRequest> httpRequest = new Mock<HttpRequest>();
         public readonly Mock<ILogger> logger = new Mock<ILogger>();
 
@@ -27,10 +26,12 @@ namespace CameraClub.Function.Tests
         public List<Photographer> testPhotographers { get; private set; }
         public List<Photo> testPhotos { get; private set; }
         public List<Club> testClubs { get; private set; }
+        public List<CompetitionPhotographer> testCompetitionPhotographers { get; private set; }
+        public Mock<BlobServiceClient> blobServiceClient { get; private set; } = new Mock<BlobServiceClient>();
 
         public void Initialize()
         {
-            this.competitionInfo = new CompetitionInfo(this.dbContext.Object, new SaveEntity(), new Translator(), this.blobServiceClient.Object);
+            this.competitionInfo = new CompetitionInfo(this.dbContext.Object, new SaveEntity(), new Translator(), new Lazy<BlobServiceClient>(this.blobServiceClient.Object));
 
             this.testCategories = new List<Category>
             {
@@ -42,6 +43,20 @@ namespace CameraClub.Function.Tests
             };
 
             this.dbContext.Setup(d => d.Categories).ReturnsDbSet(this.testCategories);
+
+            this.testCompetitionPhotographers = new List<CompetitionPhotographer>
+            {
+                new CompetitionPhotographer { CompetitionId = 1, PhotographerId = 1 },
+                new CompetitionPhotographer { CompetitionId = 1, PhotographerId = 2 },
+                new CompetitionPhotographer { CompetitionId = 1, PhotographerId = 3 },
+                new CompetitionPhotographer { CompetitionId = 2, PhotographerId = 2 },
+                new CompetitionPhotographer { CompetitionId = 2, PhotographerId = 3 },
+                new CompetitionPhotographer { CompetitionId = 2, PhotographerId = 4 },
+                new CompetitionPhotographer { CompetitionId = 3, PhotographerId = 1 },
+                new CompetitionPhotographer { CompetitionId = 3, PhotographerId = 2 }
+            };
+
+            this.dbContext.Setup(d => d.CompetitionPhotographer).ReturnsDbSet(this.testCompetitionPhotographers);
 
             this.testCompetitions = new List<Competition>
             {
@@ -57,6 +72,13 @@ namespace CameraClub.Function.Tests
                         new CompetitionPhotographer { CompetitionId = 1, PhotographerId = 1 },
                         new CompetitionPhotographer { CompetitionId = 1, PhotographerId = 2 },
                         new CompetitionPhotographer { CompetitionId = 1, PhotographerId = 3 }
+                    },
+                    Photos = new List<Photo>
+                    {
+                        new Photo { Id = 1, PhotographerId = 1, CompetitionId = 1, CategoryId = 3, FileName = "test1.jpg", Title = "Test 1", StorageId = new Guid() },
+                        new Photo { Id = 2, PhotographerId = 2, CompetitionId = 1, CategoryId = 3, FileName = "test2.jpg", Title = "Test 2", StorageId = new Guid() },
+                        new Photo { Id = 3, PhotographerId = 3, CompetitionId = 1, CategoryId = 1, FileName = "test3.jpg", Title = "Test 3", StorageId = new Guid() },
+                        new Photo { Id = 4, PhotographerId = 3, CompetitionId = 1, CategoryId = 2, FileName = "test4.jpg", Title = "Test 4", StorageId = new Guid() }
                     }
                 },
                 new Competition
@@ -71,6 +93,13 @@ namespace CameraClub.Function.Tests
                         new CompetitionPhotographer { CompetitionId = 2, PhotographerId = 2 },
                         new CompetitionPhotographer { CompetitionId = 2, PhotographerId = 3 },
                         new CompetitionPhotographer { CompetitionId = 2, PhotographerId = 4 }
+                    },
+                    Photos = new List<Photo>
+                    {
+                        new Photo { Id = 5, PhotographerId = 2, CompetitionId = 2, CategoryId = 1, FileName = "test5.jpg", Title = "Test 5", StorageId = new Guid() },
+                        new Photo { Id = 6, PhotographerId = 3, CompetitionId = 2, CategoryId = 2, FileName = "test6.jpg", Title = "Test 6", StorageId = new Guid() },
+                        new Photo { Id = 7, PhotographerId = 3, CompetitionId = 2, CategoryId = 2, FileName = "test7.jpg", Title = "Test 7", StorageId = new Guid() },
+                        new Photo { Id = 8, PhotographerId = 4, CompetitionId = 2, CategoryId = 3, FileName = "test8.jpg", Title = "Test 8", StorageId = new Guid() }
                     }
                 },
                 new Competition
@@ -84,6 +113,13 @@ namespace CameraClub.Function.Tests
                     {
                         new CompetitionPhotographer { CompetitionId = 3, PhotographerId = 1 },
                         new CompetitionPhotographer { CompetitionId = 3, PhotographerId = 2 }
+                    },
+                    Photos = new List<Photo>
+                    {
+                        new Photo { Id = 9, PhotographerId = 1, CompetitionId = 3, CategoryId = 1, FileName = "test9.jpg", Title = "Test 9", StorageId = new Guid() },
+                        new Photo { Id = 10, PhotographerId = 1, CompetitionId = 3, CategoryId = 2, FileName = "test10.jpg", Title = "Test 10", StorageId = new Guid() },
+                        new Photo { Id = 11, PhotographerId = 2, CompetitionId = 3, CategoryId = 2, FileName = "test11.jpg", Title = "Test 11", StorageId = new Guid() },
+                        new Photo { Id = 12, PhotographerId = 2, CompetitionId = 3, CategoryId = 3, FileName = "test12.jpg", Title = "Test 12", StorageId = new Guid() }
                     }
                 }
             };
@@ -177,6 +213,11 @@ namespace CameraClub.Function.Tests
             };
 
             this.dbContext.Setup(c => c.Clubs).ReturnsDbSet(this.testClubs);
+        }
+
+        public void SetBlobServiceClient(Mock<BlobServiceClient> serviceClient)
+        {
+            this.blobServiceClient = serviceClient;
         }
     }
 }

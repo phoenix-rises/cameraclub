@@ -208,7 +208,7 @@ namespace CameraClub.Function
 
                 this.UpdatePhotos(request, entityPhotos);
 
-                await this.competitionContext.SaveChangesAsync();
+                this.competitionContext.SaveChanges();
 
                 return new OkResult();
             }
@@ -216,65 +216,6 @@ namespace CameraClub.Function
             {
                 log.LogError(ex, "Error thrown when attempting to SaveCompetitionEntries");
                 throw;
-            }
-        }
-
-        public void UpdatePhotographers(SaveCompetitionEntriesRequest request, List<CompetitionPhotographer> competitionPhotographers, List<PhotoEntity> entityPhotos)
-        {
-            foreach (var photographer in competitionPhotographers.Where(cp => request.Photographers.Any(p => p.Id == cp.PhotographerId && p.IsDeleted)))
-            {
-                this.competitionContext.Remove(photographer);
-
-                entityPhotos.Where(e => e.PhotographerId == photographer.PhotographerId && e.CompetitionId == request.CompetitionId).ToList()
-                    .ForEach(p =>
-                        this.competitionContext.Remove(p)
-                    );
-
-                request.Photos.Where(w => w.PhotographerId == photographer.PhotographerId).ToList()
-                                .ForEach(h =>
-                                    request.Photos.Remove(h)
-                                );
-            }
-
-            foreach (var photographer in request.Photographers.Where(p => !p.IsDeleted && !competitionPhotographers.Any(cp => cp.PhotographerId == p.Id)))
-            {
-                this.competitionContext.CompetitionPhotographer.Add(new CompetitionPhotographer { CompetitionId = request.CompetitionId, PhotographerId = photographer.Id });
-            }
-        }
-
-        public void UpdatePhotos(SaveCompetitionEntriesRequest request, List<PhotoEntity> entityPhotos)
-        {
-            foreach (var requestPhoto in request.Photos)
-            {
-                var entityPhoto = entityPhotos.FirstOrDefault(p => p.Id == requestPhoto.Id);
-
-                if (entityPhoto != null)
-                {
-                    if (requestPhoto.IsDeleted)
-                    {
-                        this.competitionContext.Remove(entityPhoto);
-                        continue;
-                    }
-
-                    entityPhoto.CategoryId = requestPhoto.CategoryId;
-                    entityPhoto.Title = requestPhoto.Title;
-                    entityPhoto.FileName = requestPhoto.FileName;
-                    entityPhoto.StorageId = requestPhoto.StorageId;
-                }
-                else if (!requestPhoto.IsDeleted)
-                {
-                    var newPhoto = new Entities.Photo
-                    {
-                        CompetitionId = request.CompetitionId,
-                        PhotographerId = requestPhoto.PhotographerId,
-                        CategoryId = requestPhoto.CategoryId,
-                        Title = requestPhoto.Title,
-                        FileName = requestPhoto.FileName,
-                        StorageId = requestPhoto.StorageId
-                    };
-
-                    this.competitionContext.Photos.Add(newPhoto);
-                }
             }
         }
 
@@ -329,6 +270,65 @@ namespace CameraClub.Function
             memoryStream.Position = 0;
 
             return memoryStream;
+        }
+
+        private void UpdatePhotographers(SaveCompetitionEntriesRequest request, List<CompetitionPhotographer> competitionPhotographers, List<PhotoEntity> entityPhotos)
+        {
+            foreach (var photographer in competitionPhotographers.Where(cp => request.Photographers.Any(p => p.Id == cp.PhotographerId && p.IsDeleted)))
+            {
+                this.competitionContext.Remove(photographer);
+
+                entityPhotos.Where(e => e.PhotographerId == photographer.PhotographerId && e.CompetitionId == request.CompetitionId).ToList()
+                    .ForEach(p =>
+                        this.competitionContext.Remove(p)
+                    );
+
+                request.Photos.Where(w => w.PhotographerId == photographer.PhotographerId).ToList()
+                                .ForEach(h =>
+                                    request.Photos.Remove(h)
+                                );
+            }
+
+            foreach (var photographer in request.Photographers.Where(p => !p.IsDeleted && !competitionPhotographers.Any(cp => cp.PhotographerId == p.Id)))
+            {
+                this.competitionContext.CompetitionPhotographer.Add(new CompetitionPhotographer { CompetitionId = request.CompetitionId, PhotographerId = photographer.Id });
+            }
+        }
+
+        private void UpdatePhotos(SaveCompetitionEntriesRequest request, List<PhotoEntity> entityPhotos)
+        {
+            foreach (var requestPhoto in request.Photos)
+            {
+                var entityPhoto = entityPhotos.FirstOrDefault(p => p.Id == requestPhoto.Id);
+
+                if (entityPhoto != null)
+                {
+                    if (requestPhoto.IsDeleted)
+                    {
+                        this.competitionContext.Remove(entityPhoto);
+                        continue;
+                    }
+
+                    entityPhoto.CategoryId = requestPhoto.CategoryId;
+                    entityPhoto.Title = requestPhoto.Title;
+                    entityPhoto.FileName = requestPhoto.FileName;
+                    entityPhoto.StorageId = requestPhoto.StorageId;
+                }
+                else if (!requestPhoto.IsDeleted)
+                {
+                    var newPhoto = new Entities.Photo
+                    {
+                        CompetitionId = request.CompetitionId,
+                        PhotographerId = requestPhoto.PhotographerId,
+                        CategoryId = requestPhoto.CategoryId,
+                        Title = requestPhoto.Title,
+                        FileName = requestPhoto.FileName,
+                        StorageId = requestPhoto.StorageId
+                    };
+
+                    this.competitionContext.Photos.Add(newPhoto);
+                }
+            }
         }
 
         private static IActionResult InvalidRequestResponse<T>(int id, ILogger log)

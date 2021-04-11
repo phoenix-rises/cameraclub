@@ -50,9 +50,9 @@ namespace CameraClub.Function.Tests
                 Name = "Updated"
             };
 
-            var updatedCategory = this.testData.testCategories.First(c => c.Id == request.Id);
+            var categoryToUpdate = this.testData.testCategories.First(c => c.Id == request.Id);
 
-            this.testData.dbContext.Setup(d => d.FindAsync<Category>(It.IsAny<int>())).Returns(new ValueTask<Category>(updatedCategory));
+            this.testData.dbContext.Setup(d => d.FindAsync<Category>(It.IsAny<int>())).Returns(new ValueTask<Category>(categoryToUpdate));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
 
             var response = this.testData.competitionInfo.SaveCategory(request, this.testData.logger.Object).GetAwaiter();
@@ -61,8 +61,8 @@ namespace CameraClub.Function.Tests
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("Updated", updatedCategory.Name);
-            Assert.IsFalse(updatedCategory.IsDigital);
+            Assert.AreEqual("Updated", categoryToUpdate.Name);
+            Assert.IsFalse(categoryToUpdate.IsDigital);
 
             this.testData.dbContext.Verify();
         }
@@ -144,9 +144,9 @@ namespace CameraClub.Function.Tests
                 HasPrint = false
             };
 
-            var updatedCompetition = this.testData.testCompetitions.First(c => c.Id == 2);
+            var competitionToUpdate = this.testData.testCompetitions.First(c => c.Id == 2);
 
-            this.testData.dbContext.Setup(d => d.FindAsync<Competition>(It.IsAny<int>())).Returns(new ValueTask<Competition>(updatedCompetition));
+            this.testData.dbContext.Setup(d => d.FindAsync<Competition>(It.IsAny<int>())).Returns(new ValueTask<Competition>(competitionToUpdate));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
 
             var response = this.testData.competitionInfo.SaveCompetition(request, this.testData.logger.Object).GetAwaiter();
@@ -155,12 +155,12 @@ namespace CameraClub.Function.Tests
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("Updated", updatedCompetition.Name);
-            Assert.IsFalse(updatedCompetition.HasDigital);
-            Assert.IsFalse(updatedCompetition.HasPrint);
-            Assert.AreEqual(2022, updatedCompetition.Date.Year);
-            Assert.AreEqual(2, updatedCompetition.Date.Month);
-            Assert.AreEqual(10, updatedCompetition.Date.Day);
+            Assert.AreEqual("Updated", competitionToUpdate.Name);
+            Assert.IsFalse(competitionToUpdate.HasDigital);
+            Assert.IsFalse(competitionToUpdate.HasPrint);
+            Assert.AreEqual(2022, competitionToUpdate.Date.Year);
+            Assert.AreEqual(2, competitionToUpdate.Date.Month);
+            Assert.AreEqual(10, competitionToUpdate.Date.Day);
 
             this.testData.dbContext.Verify();
         }
@@ -220,9 +220,9 @@ namespace CameraClub.Function.Tests
                 PhoneNumber = "2227779999"
             };
 
-            var updatedJudge = this.testData.testJudges.First(c => c.Id == request.Id);
+            var judgeToUpdate = this.testData.testJudges.First(c => c.Id == request.Id);
 
-            this.testData.dbContext.Setup(d => d.FindAsync<Judge>(It.IsAny<int>())).Returns(new ValueTask<Judge>(updatedJudge));
+            this.testData.dbContext.Setup(d => d.FindAsync<Judge>(It.IsAny<int>())).Returns(new ValueTask<Judge>(judgeToUpdate));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
 
             var response = this.testData.competitionInfo.SaveJudges(request, this.testData.logger.Object).GetAwaiter();
@@ -231,10 +231,10 @@ namespace CameraClub.Function.Tests
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("UpdatedFirst", updatedJudge.FirstName);
-            Assert.AreEqual("UpdatedLast", updatedJudge.LastName);
-            Assert.AreEqual("Updated@gmail.com", updatedJudge.Email);
-            Assert.AreEqual("2227779999", updatedJudge.PhoneNumber);
+            Assert.AreEqual("UpdatedFirst", judgeToUpdate.FirstName);
+            Assert.AreEqual("UpdatedLast", judgeToUpdate.LastName);
+            Assert.AreEqual("Updated@gmail.com", judgeToUpdate.Email);
+            Assert.AreEqual("2227779999", judgeToUpdate.PhoneNumber);
 
             this.testData.dbContext.Verify();
         }
@@ -294,9 +294,9 @@ namespace CameraClub.Function.Tests
                 CompetitionNumber = "111"
             };
 
-            var updatedPhotographer = this.testData.testPhotographers.First(c => c.Id == request.Id);
+            var photographerToUpdate = this.testData.testPhotographers.First(c => c.Id == request.Id);
 
-            this.testData.dbContext.Setup(d => d.FindAsync<Photographer>(It.IsAny<int>())).Returns(new ValueTask<Photographer>(updatedPhotographer));
+            this.testData.dbContext.Setup(d => d.FindAsync<Photographer>(It.IsAny<int>())).Returns(new ValueTask<Photographer>(photographerToUpdate));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
 
             var response = this.testData.competitionInfo.SavePhotographer(request, this.testData.logger.Object).GetAwaiter();
@@ -305,10 +305,10 @@ namespace CameraClub.Function.Tests
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("UpdatedFirst", updatedPhotographer.FirstName);
-            Assert.AreEqual("UpdatedLast", updatedPhotographer.LastName);
-            Assert.AreEqual("Updated@gmail.com", updatedPhotographer.Email);
-            Assert.AreEqual("111", updatedPhotographer.CompetitionNumber);
+            Assert.AreEqual("UpdatedFirst", photographerToUpdate.FirstName);
+            Assert.AreEqual("UpdatedLast", photographerToUpdate.LastName);
+            Assert.AreEqual("Updated@gmail.com", photographerToUpdate.Email);
+            Assert.AreEqual("111", photographerToUpdate.CompetitionNumber);
 
             this.testData.dbContext.Verify();
         }
@@ -365,9 +365,9 @@ namespace CameraClub.Function.Tests
                 ClubAssociationNumber = "222"
             };
 
-            var updatedClub = this.testData.testClubs.First(c => c.Id == request.Id);
+            var clubToUpdate = this.testData.testClubs.First(c => c.Id == request.Id);
 
-            this.testData.dbContext.Setup(d => d.FindAsync<Club>(It.IsAny<int>())).Returns(new ValueTask<Club>(updatedClub));
+            this.testData.dbContext.Setup(d => d.FindAsync<Club>(It.IsAny<int>())).Returns(new ValueTask<Club>(clubToUpdate));
             this.testData.dbContext.Setup(d => d.SaveChanges()).Verifiable();
 
             var response = this.testData.competitionInfo.SaveClub(request, this.testData.logger.Object).GetAwaiter();
@@ -376,10 +376,10 @@ namespace CameraClub.Function.Tests
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual("Updated", updatedClub.Name);
-            Assert.AreEqual("contactme@gmail.com", updatedClub.ContactEmail);
-            Assert.AreEqual("contactme", updatedClub.ContactName);
-            Assert.AreEqual("222", updatedClub.ClubAssociationNumber);
+            Assert.AreEqual("Updated", clubToUpdate.Name);
+            Assert.AreEqual("contactme@gmail.com", clubToUpdate.ContactEmail);
+            Assert.AreEqual("contactme", clubToUpdate.ContactName);
+            Assert.AreEqual("222", clubToUpdate.ClubAssociationNumber);
 
             this.testData.dbContext.Verify();
         }
