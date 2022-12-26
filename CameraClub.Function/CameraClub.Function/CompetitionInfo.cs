@@ -40,7 +40,9 @@ namespace CameraClub.Function
         public IActionResult GetCompetitions(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
         {
-            var responseMessage = this.competitionContext.Competitions.OrderByDescending(c => c.Date).ToList();
+            var responseMessage = this.competitionContext.Competitions
+                                    .OrderByDescending(c => c.Date)
+                                    .ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -63,7 +65,9 @@ namespace CameraClub.Function
         public IActionResult GetCategories(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
-            var responseMessage = this.competitionContext.Categories.OrderBy(c => c.Name).ToList();
+            var responseMessage = this.competitionContext.Categories
+                                        .OrderBy(c => c.Name)
+                                        .ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -86,7 +90,10 @@ namespace CameraClub.Function
         public IActionResult GetJudges(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
-            var responseMessage = this.competitionContext.Judges.OrderBy(j => j.FirstName).ThenBy(j => j.LastName).ToList();
+            var responseMessage = this.competitionContext.Judges
+                                        .OrderBy(j => j.FirstName)
+                                        .ThenBy(j => j.LastName)
+                                        .ToList();
 
             return new OkObjectResult(responseMessage);
         }
@@ -109,7 +116,10 @@ namespace CameraClub.Function
         public IActionResult GetPhotographers(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest request, ILogger log)
         {
-            var responseMessage = this.competitionContext.Photographers.OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
+            var responseMessage = this.competitionContext.Photographers
+                                        .OrderBy(p => p.FirstName)
+                                        .ThenBy(p => p.LastName)
+                                        .ToList();
 
             return new OkObjectResult(responseMessage);
         }
